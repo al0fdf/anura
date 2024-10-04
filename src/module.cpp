@@ -21,9 +21,12 @@
 	   distribution.
 */
 
+#include <cstdio>
 #include <deque>
 
 #include <boost/filesystem/operations.hpp>
+#include <string>
+#include <vector>
 
 #include "asserts.hpp"
 #include "base64.hpp"
@@ -35,12 +38,14 @@
 #include "formula_constants.hpp"
 #include "http_client.hpp"
 #include "json_parser.hpp"
+#include "logger.hpp"
 #include "md5.hpp"
 #include "module.hpp"
 #include "preferences.hpp"
 #include "string_utils.hpp"
 #include "unit_test.hpp"
 #include "uri.hpp"
+#include "variant.hpp"
 #include "variant_utils.hpp"
 
 namespace module
@@ -510,6 +515,109 @@ namespace module
 				def_font, def_font_cjk, speech_dialog_bg_color};
 		m.default_preferences = v["default_preferences"];
 		m.version_ = module_version;
+
+		if(v.has_key("controls")) {
+    		if(v["controls"].has_key("names")){
+                const variant& an = v["controls"]["names"];
+                m.actions = an.getKeys().as_list_string();
+    		}
+
+            if(v["controls"].has_key("key_bindings")){
+                const variant& kb = v["controls"]["key_bindings"];
+
+                for(auto p : kb.as_map()){
+                    // keys_for_action is LIST of LIST of Strings
+                    std::vector<variant> keys_for_action = p.second.as_list_ref();
+
+                    // e.g. keys = [ ["s"] ]
+                    key_list keys;
+
+                    for (auto it = begin(keys_for_action); it != end(keys_for_action); ++it) {
+                        keys.insert(end(keys), it->as_list_string());
+                        // it is LIST of Strings
+                    }
+
+                    m.key_bindings[p.first.as_string()] = keys;
+                }
+            }
+
+            if(v["controls"].has_key("button_bindings")){
+                const variant& bb = v["controls"]["button_bindings"];
+
+                for(auto p : bb.as_map()){
+                    // butts_for_action is LIST of LIST of Strings
+                    std::vector<variant> butts_for_action = p.second.as_list_ref();
+
+                    // e.g. buttons = [ ["SDL_CONTROLLER_BUTTON_Y"] ]
+                    key_list butts;
+
+                    for (auto it = begin(butts_for_action); it != end(butts_for_action); ++it) {
+                        butts.insert(end(butts), it->as_list_string());
+                        // it is LIST of Strings
+                    }
+
+                    m.button_bindings[p.first.as_string()] = butts;
+                }
+            }
+
+            if(v["controls"].has_key("axes_bindings")){
+                const variant& ab = v["controls"]["axes_bindings"];
+
+                for(auto p : ab.as_map()){
+                    // axes_for_action is LIST of LIST of Strings
+                    // e.g. actions_for_axis = p.second.as_list_string() = ["left", "right"]
+
+                    m.axes_bindings[p.first.as_string()] = p.second.as_list_string();
+                }
+            }
+
+            /*LOG_INFO("KEYS:")
+            for (auto act_keys = begin(m.key_bindings); act_keys != end(m.key_bindings); act_keys++) {
+                LOG_INFO(act_keys->first);
+
+                std::vector<std::vector<std::string>> key_combos = act_keys->second;
+
+                for(auto key_combo : key_combos){
+                    LOG_INFO("[");
+                    for(auto key : key_combo){
+                        LOG_INFO(key);
+                    }
+                    LOG_INFO("]");
+                }
+            }
+
+            LOG_INFO("BUTTONS:");
+            for (auto act_butts = begin(m.button_bindings); act_butts != end(m.button_bindings); act_butts++) {
+                LOG_INFO(act_butts->first);
+
+                std::vector<std::vector<std::string>> butt_combos = act_butts->second;
+
+                for(auto butt_combo : butt_combos){
+                    LOG_INFO("[");
+                    for(auto butt : butt_combo){
+                        LOG_INFO(butt);
+                    }
+                    LOG_INFO("]");
+                }
+            }
+
+            LOG_INFO("AXES:");
+            for (auto axis_acts = begin(m.axes_bindings); axis_acts != end(m.axes_bindings); axis_acts++) {
+                LOG_INFO(axis_acts->first);
+
+                std::vector<std::string> acts = axis_acts->second;
+
+                LOG_INFO("[");
+                for(auto act : acts){
+                    LOG_INFO(act);
+                }
+                LOG_INFO("]");
+            }*/
+		}
+
+
+
+
 		loaded_paths().insert(loaded_paths().begin(), m);
 
 		if(initial) {

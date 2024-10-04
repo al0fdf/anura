@@ -48,7 +48,8 @@ namespace controls
 {
 	const char** control_names()
 	{
-		static const char* names[] = { "up", "down", "left", "right", "attack", "jump", "tongue", nullptr };
+	    // Null-terminated list of action names
+		static const char* names[] = { "up", "down", "left", "right", "attack", "jump", "tongue", "sprint", nullptr };
 		return names;
 	}
 
@@ -94,6 +95,7 @@ namespace controls
 
 	int first_invalid_cycle_var = -1;
 
+	// List of SDL keycodes
 	key_type sdlk[NUM_CONTROLS] = {
 		SDLK_UP,
 		SDLK_DOWN,
@@ -342,6 +344,10 @@ namespace controls
 			if(joystick::button(2)) {
 				state.keys |= 0x40;
 			}
+			// sprint
+			if(joystick::button(3)) {
+				state.keys |= 0x80;
+			}
 
 			if(g_user_ctrl_output.is_null() == false) {
 				state.user = g_user_ctrl_output.write_json();
@@ -353,6 +359,8 @@ namespace controls
 
 		g_user_ctrl_output = variant();
 
+		// some kind of buffer for controls
+		// Seems actively used for controller input
 		controls[local_player].push_back(state);
 		highest_confirmed[local_player]++;
 

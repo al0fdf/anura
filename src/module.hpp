@@ -38,6 +38,13 @@ namespace module
 {
 	enum BASE_PATH_TYPE { BASE_PATH_GAME, BASE_PATH_USER, NUM_PATH_TYPES };
 
+	// For importing the input definition from module.cfg
+	typedef std::vector<std::vector<std::string>> key_list;
+
+	typedef std::map<std::string, key_list> key_binding;
+	typedef std::map<std::string, key_list> button_binding;
+	typedef std::map<std::string, std::vector<std::string>> axes_binding;
+
 	struct modules
 	{
 		std::string name_;
@@ -57,6 +64,13 @@ namespace module
 		std::vector<std::string> included_modules_;
 
 		variant default_preferences;
+
+		key_binding key_bindings;
+		button_binding button_bindings;
+		axes_binding axes_bindings;
+
+		std::vector<std::string> actions;
+
 	};
 
 
