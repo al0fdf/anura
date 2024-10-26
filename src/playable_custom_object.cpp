@@ -149,7 +149,7 @@ bool PlayableCustomObject::onPlatform() const
 
 int PlayableCustomObject::walkUpOrDownStairs() const
 {
-	return controlStatus(controls::CONTROL_DOWN) - controlStatus(controls::CONTROL_UP);
+	return controlStatus(controls::get_action_index("down")) - controlStatus(controls::get_action_index("up"));
 }
 
 void PlayableCustomObject::process(Level& lvl)
@@ -175,8 +175,8 @@ void PlayableCustomObject::process(Level& lvl)
 	}
 
 	if(process_controls) {
-		bool controls[controls::NUM_CONTROLS];
-		for(int n = 0; n != controls::NUM_CONTROLS; ++n) {
+		bool controls[controls::num_controls];
+		for(int n = 0; n != controls::num_controls; ++n) {
 			controls[n] = controlStatus(static_cast<controls::CONTROL_ITEM>(n));
 		}
 
@@ -185,7 +185,7 @@ void PlayableCustomObject::process(Level& lvl)
 
 		// XX Need to abstract this to read controls and mappings from global game file.
 		static const std::string keys[] = { "up", "down", "left", "right", "attack", "jump", "tongue" };
-		for(int n = 0; n != controls::NUM_CONTROLS; ++n) {
+		for(int n = 0; n != controls::num_controls; ++n) {
 			if(controls[n] != controlStatus(static_cast<controls::CONTROL_ITEM>(n))) {
 				if(controls[n]) {
 					handleEvent("end_ctrl_" + keys[n]);

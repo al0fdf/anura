@@ -940,22 +940,23 @@ namespace preferences
 		password_ = node["passhash"].as_string_default("");
 		cookie_ = node.has_key("cookie") ? node["cookie"] : variant();
 
-		controls::set_keycode(controls::CONTROL_UP, static_cast<key_type>(node["key_up"].as_int(SDLK_UP)));
-		controls::set_keycode(controls::CONTROL_DOWN, static_cast<key_type>(node["key_down"].as_int(SDLK_DOWN)));
-		controls::set_keycode(controls::CONTROL_LEFT, static_cast<key_type>(node["key_left"].as_int(SDLK_LEFT)));
-		controls::set_keycode(controls::CONTROL_RIGHT, static_cast<key_type>(node["key_right"].as_int(SDLK_RIGHT)));
-		controls::set_keycode(controls::CONTROL_ATTACK, static_cast<key_type>(node["key_attack"].as_int(SDLK_d)));
-		controls::set_keycode(controls::CONTROL_JUMP, static_cast<key_type>(node["key_jump"].as_int(SDLK_a)));
-		controls::set_keycode(controls::CONTROL_TONGUE, static_cast<key_type>(node["key_tongue"].as_int(SDLK_s)));
+		controls::set_keycode(controls::get_action_index("up"), static_cast<key_type>(node["key_up"].as_int(SDLK_UP)));
+		controls::set_keycode(controls::get_action_index("down"), static_cast<key_type>(node["key_down"].as_int(SDLK_DOWN)));
+		controls::set_keycode(controls::get_action_index("left"), static_cast<key_type>(node["key_left"].as_int(SDLK_LEFT)));
+		controls::set_keycode(controls::get_action_index("right"), static_cast<key_type>(node["key_right"].as_int(SDLK_RIGHT)));
+		controls::set_keycode(controls::get_action_index("attack"), static_cast<key_type>(node["key_attack"].as_int(SDLK_d)));
+		controls::set_keycode(controls::get_action_index("jump"), static_cast<key_type>(node["key_jump"].as_int(SDLK_a)));
+		controls::set_keycode(controls::get_action_index("tongue"), static_cast<key_type>(node["key_tongue"].as_int(SDLK_s)));
 
-		int ctrl_item = 0;
-		for(const char** control_name = controls::control_names(); *control_name && ctrl_item != controls::NUM_CONTROLS; ++control_name, ++ctrl_item) {
+		//TODO: Unbreak
+		/*int ctrl_item = 0;
+		for(const char** control_name = controls::control_names(); *control_name && ctrl_item != controls::num_controls; ++control_name, ++ctrl_item) {
 			std::string key = "mouse_";
 			key += *control_name;
 			if(node.has_key(key)) {
 				controls::set_mouse_to_keycode(static_cast<controls::CONTROL_ITEM>(ctrl_item), node[key].as_int());
 			}
-		}
+		}*/
 
         preferences::set_32bpp_textures_if_kb_memory_at_least(512000);
 	}
@@ -971,21 +972,23 @@ namespace preferences
 		node.add("joystick", variant::from_bool(use_joystick_));
 		node.add("sound_volume", static_cast<int>(sound::get_sound_volume()*1000));
 		node.add("music_volume", static_cast<int>(sound::get_music_volume()*1000));
-		node.add("key_up", controls::get_keycode(controls::CONTROL_UP));
-		node.add("key_down", controls::get_keycode(controls::CONTROL_DOWN));
-		node.add("key_left", controls::get_keycode(controls::CONTROL_LEFT));
-		node.add("key_right", controls::get_keycode(controls::CONTROL_RIGHT));
-		node.add("key_attack", controls::get_keycode(controls::CONTROL_ATTACK));
-		node.add("key_jump", controls::get_keycode(controls::CONTROL_JUMP));
-		node.add("key_tongue", controls::get_keycode(controls::CONTROL_TONGUE));
+		node.add("key_up", controls::get_keycode(controls::get_action_index("up")));
+		node.add("key_down", controls::get_keycode(controls::get_action_index("down")));
+		node.add("key_left", controls::get_keycode(controls::get_action_index("left")));
+		node.add("key_right", controls::get_keycode(controls::get_action_index("right")));
+		node.add("key_attack", controls::get_keycode(controls::get_action_index("attack")));
+		node.add("key_jump", controls::get_keycode(controls::get_action_index("jump")));
+		node.add("key_tongue", controls::get_keycode(controls::get_action_index("tongue")));
 		node.add("show_iphone_controls", variant::from_bool(show_iphone_controls_));
 
+		//TODO: Unbreak
+		/*
 		for(int n = 1; n <= 3; ++n) {
 			controls::CONTROL_ITEM ctrl = controls::get_mouse_keycode(n);
-			if(ctrl != controls::NUM_CONTROLS) {
+			if(ctrl != controls::num_controls) {
 				node.add(std::string("mouse_") + controls::control_names()[ctrl], variant(n));
 			}
-		}
+			}*/
 
 		node.add("locale", locale_);
 		node.add("username", variant(get_username()));

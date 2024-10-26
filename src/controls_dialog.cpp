@@ -30,15 +30,16 @@
 #include "i18n.hpp"
 #include "key_button.hpp"
 #include "screen_handling.hpp"
+#include <vector>
 
 namespace
 {
-	gui::KeyButtonPtr KeyButtons[controls::NUM_CONTROLS];
+	std::vector<gui::KeyButtonPtr> KeyButtons(controls::num_controls);
 
 	void end_dialog(gui::Dialog* d)
 	{
 		using namespace controls;
-		for(int n = 0; n < NUM_CONTROLS; ++n) {
+		for(int n = 0; n < num_controls; ++n) {
 			const CONTROL_ITEM item = static_cast<CONTROL_ITEM>(n);
 			set_keycode(item, KeyButtons[item]->get_key());
 		}
@@ -52,7 +53,7 @@ void show_controls_dialog()
 	using namespace controls;
 	const int vw = graphics::GameScreen::get().getVirtualWidth();
 	const int vh = graphics::GameScreen::get().getVirtualHeight();
-	
+
 	//HACK: 10 and 4 are the default button padding. Padding should be taken from buttons in KeyButtons list
 	int butt_padx = 10;
 	int butt_pady = 4;
@@ -62,7 +63,7 @@ void show_controls_dialog()
 
 	int butt_width_wp = butt_width + butt_padx;
 	int butt_height_wp = butt_height + butt_pady;
-	
+
 	int sep_y = 50;
 
 	int height = vh- 20;
@@ -74,32 +75,32 @@ void show_controls_dialog()
 	d.setDrawBackgroundFn(draw_last_scene);
 
 
-	for(int n = 0; n < NUM_CONTROLS; ++n) {
+	for(int n = 0; n < num_controls; ++n) {
 		const CONTROL_ITEM item = static_cast<CONTROL_ITEM>(n);
 		KeyButtons[item] = KeyButtonPtr(new KeyButton(get_keycode(item), BUTTON_SIZE_DOUBLE_RESOLUTION));
 		KeyButtons[item]->setDim(butt_width, butt_height);
 	}
 
 	WidgetPtr t_dirs(new GraphicalFontLabel(_("Directions"), "door_label", 2));
-	WidgetPtr b_up(KeyButtons[CONTROL_UP]);
-	WidgetPtr b_down(KeyButtons[CONTROL_DOWN]);
-	WidgetPtr b_left(KeyButtons[CONTROL_LEFT]);
-	WidgetPtr b_right(KeyButtons[CONTROL_RIGHT]);
+	WidgetPtr b_up(KeyButtons[controls::get_action_index("up")]);
+	WidgetPtr b_down(KeyButtons[controls::get_action_index("down")]);
+	WidgetPtr b_left(KeyButtons[controls::get_action_index("left")]);
+	WidgetPtr b_right(KeyButtons[controls::get_action_index("right")]);
 
 	WidgetPtr t_jump(new GraphicalFontLabel(_("Jump"), "door_label", 2));
-	WidgetPtr b_jump(KeyButtons[CONTROL_JUMP]);
+	WidgetPtr b_jump(KeyButtons[controls::get_action_index("jump")]);
 	WidgetPtr t_tongue(new GraphicalFontLabel(_("Tongue"), "door_label", 2));
-	WidgetPtr b_tongue(KeyButtons[CONTROL_TONGUE]);
+	WidgetPtr b_tongue(KeyButtons[controls::get_action_index("tongue")]);
 	WidgetPtr t_item(new GraphicalFontLabel(_("Item"), "door_label", 2));
-	WidgetPtr b_item(KeyButtons[CONTROL_ATTACK]);
-	
+	WidgetPtr b_item(KeyButtons[controls::get_action_index("attack")]);
+
 	//WidgetPtr b_sprint(KeyButtons[CONTROL_SPRINT]);
 	//WidgetPtr t_sprint(new GraphicalFontLabel(_("Sprint"), "door_label", 2));
 
 	WidgetPtr back_button(new Button(WidgetPtr(new GraphicalFontLabel(_("Back"), "door_label", 2)), std::bind(end_dialog, &d), BUTTON_STYLE_DEFAULT, BUTTON_SIZE_DOUBLE_RESOLUTION));
 	back_button->setDim(230, 60);
 
-	
+
 	int top_label_height = d.padding();
 	int top_label_botm_edge = top_label_height+t_dirs->height();
 

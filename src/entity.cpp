@@ -26,6 +26,7 @@
 
 #include "Canvas.hpp"
 
+#include "controls.hpp"
 #include "custom_object.hpp"
 #include "debug_console.hpp"
 #include "entity.hpp"
@@ -65,9 +66,10 @@ Entity::Entity(variant node)
 		setAnchorY(node["anchory"].as_decimal());
 	}
 
-	for(bool& b : controls_) {
-		b = false;
-	}
+
+	for (int i=0;i<controls::num_controls;i++) {
+        controls_[i] = false;
+    }
 }
 
 Entity::Entity(int x, int y, bool face_right)
@@ -81,8 +83,8 @@ Entity::Entity(int x, int y, bool face_right)
 	mouseover_delay_(0), mouseover_trigger_cycle_(std::numeric_limits<int>::max()),
 	true_z_(false), tx_(double(x)), ty_(double(y)), tz_(0.0f)
 {
-	for(bool& b : controls_) {
-		b = false;
+	for(int i=0;i<controls::num_controls;i++) {
+		controls_[i] = false;
 	}
 }
 
@@ -571,7 +573,7 @@ const rect& Entity::getMouseOverArea() const
 
 void Entity::beingRemoved()
 {
-	scheduled_commands_.clear();
+    scheduled_commands_.clear();
 }
 
 bool zorder_compare(const EntityPtr& a, const EntityPtr& b)

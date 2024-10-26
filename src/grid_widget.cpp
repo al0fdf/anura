@@ -567,8 +567,8 @@ namespace gui
 						selected_row_ = 0;
 					}
 					claimed = true;
-				} else if(ev.key.keysym.sym == controls::get_keycode(controls::CONTROL_ATTACK)
-					|| ev.key.keysym.sym == controls::get_keycode(controls::CONTROL_JUMP)) {
+				} else if(ev.key.keysym.sym == controls::get_keycode(controls::get_action_index("attack"))
+					|| ev.key.keysym.sym == controls::get_keycode(controls::get_action_index("jump"))) {
 					if(on_select_) {
 						on_select_(selected_row_);
 					}

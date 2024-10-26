@@ -263,7 +263,7 @@ public:
 	void setControlStatusUser(const variant& v) { controls_user_ = v; }
 	void setControlStatus(const std::string& key, bool value);
 	void setControlStatus(controls::CONTROL_ITEM ctrl, bool value) { controls_[ctrl] = value; }
-	void clearControlStatus() { for(int n = 0; n != controls::NUM_CONTROLS; ++n) { controls_[n] = false; } }
+	void clearControlStatus() { for(int n = 0; n != controls::num_controls; ++n) { controls_[n] = false; } }
 
 	virtual bool enter() const { return false; }
 
@@ -418,7 +418,7 @@ private:
 
 	std::vector<ScheduledCommand> scheduled_commands_;
 
-	bool controls_[controls::NUM_CONTROLS];
+	std::vector<bool> controls_;
 	variant controls_user_;
 
 	//attached objects are objects which are also drawn with this object.

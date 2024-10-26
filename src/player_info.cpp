@@ -72,16 +72,17 @@ variant PlayerInfo::write() const
 
 void PlayerInfo::readControls(int cycle)
 {
-	bool status[controls::NUM_CONTROLS];
+	bool status[controls::num_controls];
 	const std::string* user = nullptr;
 	controls::get_controlStatus(cycle, slot_, status, &user);
 
-	if(status[controls::CONTROL_LEFT] && status[controls::CONTROL_RIGHT]) {
+	//TODO: Fix
+	/*if(status[controls::get_action_index("left")] && status[controls::get_action_index("right")]) {
 		//if both left and right are held, treat it as if neither are.
-		status[controls::CONTROL_LEFT] = status[controls::CONTROL_RIGHT] = false;
-	}
+		status[controls::get_action_index("left")] = status[controls::get_action_index("right")] = false;
+		}*/
 
-	for(int n = 0; n != controls::NUM_CONTROLS; ++n) {
+	for(int n = 0; n != controls::num_controls; ++n) {
 		entity_->setControlStatus(static_cast<controls::CONTROL_ITEM>(n), status[n]);
 	}
 

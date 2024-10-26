@@ -120,13 +120,13 @@ bool SpeechDialog::keyPress(const SDL_Event& event)
 	static int last_mouse = 0;
 	if(text_char_ == num_chars() && options_.empty() == false) {
 		if(event.type == SDL_KEYDOWN) {
-			if(event.key.keysym.sym == get_keycode(controls::CONTROL_UP)) {
+			if(event.key.keysym.sym == controls::get_keycode(controls::get_action_index("up"))) {
 				moveUp();
-			} else if(event.key.keysym.sym == get_keycode(controls::CONTROL_DOWN)) {
+			} else if(event.key.keysym.sym == controls::get_keycode(controls::get_action_index("down"))) {
 				moveDown();
 			} else if(event.key.keysym.sym == SDLK_RETURN || event.key.keysym.sym == SDLK_SPACE ||
-				event.key.keysym.sym == get_keycode(controls::CONTROL_JUMP) ||
-				event.key.keysym.sym == get_keycode(controls::CONTROL_TONGUE)) {
+				event.key.keysym.sym == controls::get_keycode(controls::get_action_index("jump")) ||
+				event.key.keysym.sym == controls::get_keycode(controls::get_action_index("tongue"))) {
 				return true;
 			}
 		}

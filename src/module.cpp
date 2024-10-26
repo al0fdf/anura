@@ -21,6 +21,7 @@
 	   distribution.
 */
 
+#include <SDL2/SDL_keycode.h>
 #include <cstdio>
 #include <deque>
 
@@ -31,6 +32,7 @@
 #include "asserts.hpp"
 #include "base64.hpp"
 #include "compress.hpp"
+#include "controls.hpp"
 #include "custom_object_type.hpp"
 #include "i18n.hpp"
 #include "filesystem.hpp"
@@ -88,8 +90,33 @@ namespace module
 
 		game_logic::ConstFormulaCallablePtr module_args;
 
-	std::string core_module_name;
+		std::string core_module_name;
 	}
+
+	// Ignore the 'controls' section imported from module.cfg for now. I just want the logic working
+	const char** module_control_names()
+	{
+	    // Null-terminated list of action names
+		// TODO: replace with information from frogatto's module.cfg
+		static const char* names[] = { "jump", "tongue", "item", "sprint", "inventory", "pane-left", "pane-right", nullptr };
+		return names;
+	}
+	key_type* control_keys()
+	{
+	    // List of action keys
+		// TODO: replace with information from frogatto's module.cfg
+		static key_type keys[] = {
+		    SDLK_a,
+			SDLK_s,
+			SDLK_d,
+			SDLK_LSHIFT,
+			SDLK_i,
+			SDLK_q,
+			SDLK_w
+		};
+		return keys;
+	}
+
 
 	void set_core_module_name(const std::string& module_name)
 	{
@@ -522,7 +549,8 @@ namespace module
                 m.actions = an.getKeys().as_list_string();
     		}
 
-            if(v["controls"].has_key("key_bindings")){
+
+            /*if(v["controls"].has_key("key_bindings")){
                 const variant& kb = v["controls"]["key_bindings"];
 
                 for(auto p : kb.as_map()){
@@ -569,7 +597,7 @@ namespace module
 
                     m.axes_bindings[p.first.as_string()] = p.second.as_list_string();
                 }
-            }
+            }*/
 
             /*LOG_INFO("KEYS:")
             for (auto act_keys = begin(m.key_bindings); act_keys != end(m.key_bindings); act_keys++) {

@@ -270,6 +270,9 @@ namespace
 
 			argv->insert(argv->begin() + insertion_point, arguments.begin(), arguments.end());
 		}
+
+		// resize num_controls to represent the actual number of actions
+		controls::resize_controls_list();
 		return 0;
 	}
 

@@ -21,6 +21,7 @@
 	   distribution.
 */
 
+#include <SDL2/SDL_stdinc.h>
 #ifdef _MSC_VER
 #include <winsock2.h>
 #else
@@ -37,6 +38,7 @@
 
 #include "asserts.hpp"
 #include "controls.hpp"
+#include "module.hpp"
 #include "joystick.hpp"
 #include "multiplayer.hpp"
 #include "preferences.hpp"
@@ -46,11 +48,44 @@ PREF_INT(max_control_history, 1024, "Maximum number of frames to keep control hi
 
 namespace controls
 {
-	const char** control_names()
+    void resize_controls_list(){
+        // Change num_controls variable to accurately reflect
+    	// the number of current actions
+    	const char** names = control_names();
+
+    	for(int n=0;names[n] != NULL;n++){
+    	   num_controls=n;
+    	}
+
+        // List of SDL keycodes
+        sdlk = (key_type*) malloc(num_controls*sizeof(key_type));
+        if(sdlk == NULL){
+            LOG_ERROR("Memory not allocated to sdlk");
+            exit(0);
+        }
+        sdlk = module::control_keys();
+
+
+    	LOG_INFO("NUMBER OF CONTROLS:");
+    	LOG_INFO(num_controls);
+    }
+
+	const static char** control_names()
 	{
 	    // Null-terminated list of action names
-		static const char* names[] = { "up", "down", "left", "right", "attack", "jump", "tongue", "sprint", nullptr };
-		return names;
+		//static const char* names[] = { "up", "down", "left", "right", "attack", "jump", "tongue", "sprint", nullptr };
+		return module::module_control_names();
+	}
+
+	int get_action_index(std::string string){
+		const char** names = control_names();
+		for(int i=0;names[i] != NULL;i++){
+			// Does '==' work for std::string and char* comparison?
+			if (string == names[i]){
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	namespace {
@@ -95,21 +130,10 @@ namespace controls
 
 	int first_invalid_cycle_var = -1;
 
-	// List of SDL keycodes
-	key_type sdlk[NUM_CONTROLS] = {
-		SDLK_UP,
-		SDLK_DOWN,
-		SDLK_LEFT,
-		SDLK_RIGHT,
-		SDLK_d,
-		SDLK_a,
-		SDLK_s
-	};
-
 	CONTROL_ITEM g_mouse_controls[3] = {
-		NUM_CONTROLS,
-		NUM_CONTROLS,
-		NUM_CONTROLS,
+		num_controls,
+		num_controls,
+		num_controls,
 	};
 
 	//If any of these keys are held, we ignore other keyboard input.
@@ -240,18 +264,22 @@ namespace controls
     	    }
 	}
 
+	//array of keys which we are ignoring. We ignore keys on the end of a dialog.
+	//keys will be unignored as soon as they are no longer depressed.
 
-	namespace
-	{
-		//array of keys which we are ignoring. We ignore keys on the end of a dialog.
-		//keys will be unignored as soon as they are no longer depressed.
-		bool key_ignore[NUM_CONTROLS];
+	bool* key_ignore = (bool*) malloc(num_controls*sizeof(bool));
+	if(key_ignore == NULL){
+        LOG_ERROR("Memory not allocated to key_ignore");
+        exit(0);
+	}
+	for(int i=0;i<num_controls;i++){
+		key_ignore[i] = false;
 	}
 
 	void ignore_current_keypresses()
 	{
 		const Uint8 *state = SDL_GetKeyboardState(nullptr);
-		for(int n = 0; n < NUM_CONTROLS; ++n) {
+		for(int n = 0; n < num_controls; ++n) {
 			key_ignore[n] = state[SDL_GetScancodeFromKey(sdlk[n])] != 0;
 		}
 	}
@@ -305,14 +333,14 @@ namespace controls
 
 			Uint32 mouse_buttons = SDL_GetMouseState(nullptr, nullptr);
 			for(int n = 0; n < 3; ++n) {
-				if(g_mouse_controls[n] != NUM_CONTROLS && (mouse_buttons&SDL_BUTTON(n+1))) {
+				if(g_mouse_controls[n] != num_controls && (mouse_buttons&SDL_BUTTON(n+1))) {
 					if(!key_ignore[g_mouse_controls[n]]) {
 						state.keys |= (1 << g_mouse_controls[n]);
 					}
 				}
 			}
 
-			for(int n = 0; n < NUM_CONTROLS; ++n) {
+			for(int n = 0; n < num_controls; ++n) {
 				if(key_state[SDL_GetScancodeFromKey(sdlk[n])] && !ignore_keypresses) {
 					if(!key_ignore[n]) {
 						state.keys |= (1 << n);
@@ -404,7 +432,7 @@ namespace controls
 
 		cycle -= delay;
 		if(cycle < 0) {
-			for(int n = 0; n != NUM_CONTROLS; ++n) {
+			for(int n = 0; n != num_controls; ++n) {
 				output[n] = false;
 			}
 			return;
@@ -414,7 +442,7 @@ namespace controls
 
 		unsigned char state = controls[player][cycle].keys;
 
-		for(int n = 0; n != NUM_CONTROLS; ++n) {
+		for(int n = 0; n != num_controls; ++n) {
 			output[n] = (state&(1 << n)) ? true : false;
 		}
 
@@ -698,7 +726,7 @@ namespace controls
 			for(unsigned m = 0; m < controls[n].size() && m < static_cast<unsigned>(highest_confirmed[n]); ++m) {
 				ss.clear();
 				ss << "CTRL PLAYER " << n << " CYCLE " << m << ": ";
-				for(int j = 0; j != NUM_CONTROLS; ++j) {
+				for(int j = 0; j != num_controls; ++j) {
 					ss << (((1 << j)&controls[n][m].keys) ? "1" : "0");
 				}
 				LOG_INFO(ss.str());
@@ -721,19 +749,19 @@ namespace controls
 			return g_mouse_controls[mouse_button];
 		}
 
-		return NUM_CONTROLS;
+		return num_controls;
 	}
 
 	void set_keycode(CONTROL_ITEM item, key_type key)
 	{
-		if (item < NUM_CONTROLS) {
+		if (item < num_controls) {
 			sdlk[item] = key;
 		}
 	}
 
 	key_type get_keycode(CONTROL_ITEM item)
 	{
-		if (item < NUM_CONTROLS) {
+		if (item < num_controls) {
 			return sdlk[item];
 		}
 		return SDLK_UNKNOWN;

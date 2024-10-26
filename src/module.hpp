@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "controls.hpp"
 #include "filesystem.hpp"
 #include "formula_callable.hpp"
 #include "variant.hpp"
@@ -41,7 +42,9 @@ namespace module
 	// For importing the input definition from module.cfg
 	typedef std::vector<std::vector<std::string>> key_list;
 
-	typedef std::map<std::string, key_list> key_binding;
+	typedef std::vector<std::vector<int>> keyb_list;
+
+	typedef std::map<std::string, keyb_list> key_binding;
 	typedef std::map<std::string, key_list> button_binding;
 	typedef std::map<std::string, std::vector<std::string>> axes_binding;
 
@@ -70,9 +73,10 @@ namespace module
 		axes_binding axes_bindings;
 
 		std::vector<std::string> actions;
-
 	};
 
+	const char** module_control_names();
+	key_type* control_keys();
 
 	typedef std::map<std::string, std::string> module_file_map;
 	typedef std::pair<std::string, std::string> module_file_pair;

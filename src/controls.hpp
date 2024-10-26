@@ -33,7 +33,8 @@ class variant;
 
 namespace controls
 {
-	enum CONTROL_ITEM {
+	void resize_controls_list();
+/*	enum CONTROL_ITEM {
 		CONTROL_UP,
 		CONTROL_DOWN,
 		CONTROL_LEFT,
@@ -41,10 +42,15 @@ namespace controls
 		CONTROL_ATTACK,
 		CONTROL_JUMP,
 		CONTROL_TONGUE,
-		NUM_CONTROLS,
-	};
+		num_controls,
+		};*/
 
-	const char** control_names();
+	static key_type * sdlk;
+	static int num_controls;
+	typedef int CONTROL_ITEM;
+
+	const static char** control_names();
+	int get_action_index(std::string string);
 
 	void set_mouse_to_keycode(CONTROL_ITEM item, int mouse_button);
 	CONTROL_ITEM get_mouse_keycode(int mouse_button);

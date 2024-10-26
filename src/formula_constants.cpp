@@ -85,19 +85,19 @@ namespace game_logic
 		} else if(id == "PASSWORD") {
 			return variant(preferences::get_password());
 		} else if(id == "UP_KEY") {
-			return variant(gui::KeyButton::getKeyName(controls::get_keycode(controls::CONTROL_UP)));
+			return variant(gui::KeyButton::getKeyName(controls::get_keycode(controls::get_action_index("up"))));
 		} else if(id == "DOWN_KEY") {
-			return variant(gui::KeyButton::getKeyName(controls::get_keycode(controls::CONTROL_DOWN)));
+			return variant(gui::KeyButton::getKeyName(controls::get_keycode(controls::get_action_index("down"))));
 		} else if(id == "LEFT_KEY") {
-			return variant(gui::KeyButton::getKeyName(controls::get_keycode(controls::CONTROL_LEFT)));
+			return variant(gui::KeyButton::getKeyName(controls::get_keycode(controls::get_action_index("left"))));
 		} else if(id == "RIGHT_KEY") {
-			return variant(gui::KeyButton::getKeyName(controls::get_keycode(controls::CONTROL_RIGHT)));
+			return variant(gui::KeyButton::getKeyName(controls::get_keycode(controls::get_action_index("right"))));
 		} else if(id == "JUMP_KEY") {
-			return variant(gui::KeyButton::getKeyName(controls::get_keycode(controls::CONTROL_JUMP)));
+			return variant(gui::KeyButton::getKeyName(controls::get_keycode(controls::get_action_index("jump"))));
 		} else if(id == "TONGUE_KEY") {
-			return variant(gui::KeyButton::getKeyName(controls::get_keycode(controls::CONTROL_TONGUE)));
+			return variant(gui::KeyButton::getKeyName(controls::get_keycode(controls::get_action_index("tongue"))));
 		} else if(id == "ATTACK_KEY") {
-			return variant(gui::KeyButton::getKeyName(controls::get_keycode(controls::CONTROL_ATTACK)));
+			return variant(gui::KeyButton::getKeyName(controls::get_keycode(controls::get_action_index("attack"))));
 		} else if(id == "LOCALE") {
 			return variant(i18n::get_locale());
 		} else if(id == "EPSILON") {
