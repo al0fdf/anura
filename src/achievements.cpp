@@ -22,7 +22,10 @@
 */
 
 #include <algorithm>
+#include <array>
 #include <map>
+#include <string>
+#include <vector>
 
 #include "achievements.hpp"
 #include "filesystem.hpp"
@@ -69,6 +72,18 @@ Achievement::Achievement(variant node)
 namespace
 {
 	std::vector<std::string>* achievements = nullptr;
+}
+
+std::vector<std::string>* get_attained(){
+	if(achievements == nullptr) {
+		achievements = new std::vector<std::string>;
+		variant val = preferences::registry()->queryValue("achievements");
+		if(val.is_string()) {
+			*achievements = util::split(val.as_string());
+			std::sort(achievements->begin(), achievements->end());
+		}
+	}
+	return achievements;
 }
 
 bool Achievement::attain(const std::string& id)

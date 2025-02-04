@@ -43,6 +43,7 @@ public:
 	const std::string& description() const { return description_; }
 	int points() const { return points_; }
 	static bool attain(const std::string& id);
+	static std::vector<std::string>* get_attained();
 private:
 	std::string id_, name_, description_;
 	int points_;

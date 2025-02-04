@@ -23,6 +23,7 @@
 
 #include <iostream>
 #include <map>
+#include <variant>
 #include <vector>
 #include <string>
 #include <time.h>
@@ -81,6 +82,7 @@
 #include "unit_test.hpp"
 #include "preferences.hpp"
 #include "module.hpp"
+#include "variant.hpp"
 #include "variant_utils.hpp"
 #include "widget_factory.hpp"
 #include "graphical_font.hpp"
@@ -3227,6 +3229,15 @@ RETURN_TYPE("bool")
 		return variant(cmd);
 	RETURN_TYPE("commands")
 	END_FUNCTION_DEF(end_game)
+
+	FUNCTION_DEF(get_achievements, 0, 1, "get_achievements(): Returns ids of all collected achievements")
+		std::vector<std::string>* ach = Achievement::get_attained();
+		variant_list result = new variant_list();
+		return result;
+	FUNCTION_ARGS_DEF
+		ARG_TYPE("string")
+	RETURN_TYPE("list")
+	END_FUNCTION_DEF(get_achievements)
 
 	class AchievementCommand : public EntityCommandCallable
 	{
