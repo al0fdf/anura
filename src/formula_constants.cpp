@@ -84,6 +84,8 @@ namespace game_logic
 			return variant(preferences::get_username());
 		} else if(id == "PASSWORD") {
 			return variant(preferences::get_password());
+		//TODO: Ask DDR/Jetrel on where this get_constant function is called, and if these should be removed, seeing
+		// as actions are dynamically defined now
 		} else if(id == "UP_KEY") {
 			return variant(gui::KeyButton::getKeyName(controls::get_keycode(controls::CONTROL_UP)));
 		} else if(id == "DOWN_KEY") {

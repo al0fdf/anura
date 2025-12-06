@@ -21,6 +21,7 @@
 	   distribution.
 */
 
+#include <SDL2/SDL_keyboard.h>
 #include <iostream>
 #include <map>
 #include <vector>
@@ -4454,7 +4455,25 @@ RETURN_TYPE("bool")
 	RETURN_TYPE("commands")
 	END_FUNCTION_DEF(module_launch)
 
-		//(name, min_args, max_args, helpstring)
+	FUNCTION_DEF(sdl_key_to_name, 1, 1, "sdl_key_to_name(int) -> string: Returns the key's name for a given sdl keycode. This function returns the same value that the 'ctrl_keys' variable of a playable object will use")
+		int key = EVAL_ARG(0).as_int();
+
+		// Convert printable alphabet keys to lowercase
+		if(key < 128 && util::c_isprint(key)) {
+			std::string str(1,key);
+			return variant(str);
+		}
+		const char* name = SDL_GetKeyName(key);
+		if(*name) {
+			return variant(name);
+		} else {
+			return variant(key);
+		}
+		FUNCTION_ARGS_DEF
+			ARG_TYPE("int");
+		RETURN_TYPE("string");
+	END_FUNCTION_DEF(sdl_key_to_name)
+
 	FUNCTION_DEF(get_keys_for_action, 1, 1, "get_keys_for_action(string) -> list: Prints the SDL keycodes configured for engine actions.")
 			std::string action_name = EVAL_ARG(0).as_string();
 
