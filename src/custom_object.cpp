@@ -3604,8 +3604,15 @@ variant CustomObject::getValueBySlot(int slot) const
 	case CUSTOM_OBJECT_CTRL_RIGHT:
 	case CUSTOM_OBJECT_CTRL_ATTACK:
 	case CUSTOM_OBJECT_CTRL_JUMP:
-	case CUSTOM_OBJECT_CTRL_TONGUE:
-		return variant::from_bool(controlStatus(static_cast<controls::CONTROL_ITEM>(slot - CUSTOM_OBJECT_CTRL_UP)));
+	case CUSTOM_OBJECT_CTRL_TONGUE: {
+		//al0f here. Added this list here to ensure that calls to variables like
+		// ctrl_tongue, or ctrl_left still work from ffl. Because I do not understand where the
+		// relevant constants are defined. The 'idx_to_action' array just maps the index to an
+		// action name, and controlStatus is rewritten to  use an action name instead
+		// of the hard-coded control key ints
+		const char* idx_to_action[7] = {"up", "down", "left", "right", "item", "jump", "tongue"};
+		return variant::from_bool(controlStatus(idx_to_action[slot - CUSTOM_OBJECT_CTRL_UP]));
+	}
 
 	case CUSTOM_OBJECT_CTRL_USER:
 		return controlStatusUser();

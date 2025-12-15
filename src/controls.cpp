@@ -49,6 +49,11 @@ PREF_INT(max_control_history, 1024, "Maximum number of frames to keep control hi
 
 namespace controls
 {
+	const char* legacy_control_to_string(CONTROL_ITEM item) {
+		const char* idx_to_action[7] = {"up", "down", "left", "right", "item", "jump", "tongue"};
+		return idx_to_action[item - CONTROL_UP];
+	}
+	
 	ActionBindings::ActionBindings(){
 	}
 	ActionBindings::~ActionBindings(){
@@ -184,7 +189,29 @@ namespace controls
 		}
 		return false;
 	}
-
+	
+	bool ActionBindings::is_action_down(std::string action_name){
+		std::vector<variant> key_combos = this->get_keys_for_action(action_name).as_list();
+		for(int i=0;i<key_combos.size();i++){
+			bool all_true = true;
+			
+			std::vector<int> combo = key_combos[i].as_list_int();
+			
+			for(int j=0;j<combo.size();j++){
+				int keycode = combo[j];
+				const Uint8 *state = SDL_GetKeyboardState(nullptr);
+				if(!state[keycode]){
+					all_true = false;
+				}
+			}
+			
+			if(all_true){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	void ActionBindings::write_to_preferences(variant_builder *node){
 		for(auto p = this->action_names.begin(); p != this->action_names.end(); ++p) {
       		std::string action_name = p->first;
