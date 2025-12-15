@@ -68,7 +68,9 @@ namespace controls
 			bool has_action(std::string action_name);
 			void set_are_bindings_default(std::string action_name, bool value);
 			bool are_bindings_default_for_action(std::string action_name);
-
+			
+			
+			
 			void write_to_preferences(variant_builder *node);
 			void read_from_preferences(variant node);
 		private:
@@ -79,7 +81,9 @@ namespace controls
 	};
 
 	extern ActionBindings engine_mappings;
-
+	
+	ActionBindings* get_control_mappings();
+	
 	const char** control_names();
 
 	void set_mouse_to_keycode(CONTROL_ITEM item, int mouse_button);

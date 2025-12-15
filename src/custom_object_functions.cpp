@@ -4477,8 +4477,8 @@ RETURN_TYPE("bool")
 	FUNCTION_DEF(get_keys_for_action, 1, 1, "get_keys_for_action(string) -> list: Prints the SDL keycodes configured for engine actions.")
 			std::string action_name = EVAL_ARG(0).as_string();
 			
-			if(controls::engine_mappings.has_action(action_name)){
-				return controls::engine_mappings.get_keys_for_action_ffl(action_name);
+			if(controls::get_control_mappings()->has_action(action_name)){
+				return controls::get_control_mappings()->get_keys_for_action_ffl(action_name);
 			} else {
 				return module::get_module_mappings()->get_keys_for_action_ffl(action_name);
 			}
@@ -4496,7 +4496,7 @@ RETURN_TYPE("bool")
 		std::vector<int> c_value = value.as_list_int();
 
 		if(controls::engine_mappings.has_action(action_name)){
-			return controls::engine_mappings.add_key_for_action(action_name, index, c_value);
+			return controls::get_control_mappings()->add_key_for_action(action_name, index, c_value);
 		} else {
 			return module::get_module_mappings()->add_key_for_action(action_name, index, c_value);
 		}
@@ -4511,8 +4511,8 @@ RETURN_TYPE("bool")
 		std::string action_name = EVAL_ARG(0).as_string();
 		int index = EVAL_ARG(1).as_int();
 
-		if(controls::engine_mappings.has_action(action_name)){
-			return controls::engine_mappings.del_key_for_action(action_name, index);
+		if(controls::get_control_mappings()->has_action(action_name)){
+			return controls::get_control_mappings()->del_key_for_action(action_name, index);
 		} else {
 			return module::get_module_mappings()->del_key_for_action(action_name, index);
 		}

@@ -930,7 +930,7 @@ namespace preferences
 		// Read controls
 		controls::ActionBindings* module_mappings = module::get_module_mappings();
 
-		controls::engine_mappings.read_from_preferences(node);
+		controls::get_control_mappings()->read_from_preferences(node);
 		module_mappings->read_from_preferences(node);
 
 		// end read controls
@@ -1000,10 +1000,8 @@ namespace preferences
 		node.add("key_tongue", controls::get_keycode(controls::CONTROL_TONGUE));
 		node.add("show_iphone_controls", variant::from_bool(show_iphone_controls_));
 
-		controls::ActionBindings* module_mappings = module::get_module_mappings();
-
-		controls::engine_mappings.write_to_preferences(&node);
-		module_mappings->write_to_preferences(&node);
+		controls::get_control_mappings()->write_to_preferences(&node);
+		module::get_module_mappings()->write_to_preferences(&node);
 
 		for(int n = 1; n <= 3; ++n) {
 			controls::CONTROL_ITEM ctrl = controls::get_mouse_keycode(n);

@@ -53,7 +53,7 @@ namespace
 			printf("'Setting' key code of action %s to %d\n", act_name.c_str(), (int) KeyButtons[act_name]->get_key());
 			
 			// Select the ActionBindings object which has the action we're referring to
-			ActionBindings *engine_mapping = &controls::engine_mappings;
+			ActionBindings *engine_mapping = controls::get_control_mappings();
 			controls::ActionBindings *module_mapping = module::get_module_mappings();
 			ActionBindings *mapping;
 			
@@ -64,25 +64,28 @@ namespace
 			}
 			
 			ComboList keys_for_action = mapping->get_keys_for_action(act_name);
-			printf("Last key for action is %s\n", SDL_GetKeyName(keys_for_action[keys_for_action.size()-1][0]));
+			
+			int old_key = keys_for_action[keys_for_action.size()-1][0];
+			printf("Last key for action is %s\n", SDL_GetKeyName(old_key));
+			
 			
 			// Create a blank list into which we place the result from the button
 			std::vector<int> result;
-			result.push_back((int) KeyButtons[act_name]->get_key());
+			int new_key = KeyButtons[act_name]->get_key();
+			result.push_back(new_key);
 			
-			// Remove the last key binding, and then add it again with the new data
-			//mapping.del_key_for_action(act_name, keys_for_action.size()-1);
-			//keys_for_action = mapping.get_keys_for_action(act_name);
-			//printf("After removing, len is %d\n", (int)keys_for_action.size());
-			//mapping.add_key_for_action(act_name, keys_for_action.size()-1, result);
-			//keys_for_action = mapping.get_keys_for_action(act_name);
-			//printf("Last key for action is %s\n", SDL_GetKeyName(keys_for_action[keys_for_action.size()-1][0]));
-			// 
-			// 
+			// Mark the action as being modified from the default value if the keycodes do not match
+			// This is neccessary for the action to be saved to the preferences
+			if(new_key != old_key){
+				mapping->set_are_bindings_default(act_name, false);
+			}
+			
+			// Remove the last key binding, and then add it again with the new data 
 			keys_for_action[keys_for_action.size()-1] = result;
 			printf("Keys for action are %s\n", 	SDL_GetKeyName(keys_for_action[keys_for_action.size()-1][0]));
 			mapping->set_keys_for_action(act_name, keys_for_action);
 			keys_for_action = mapping->get_keys_for_action(act_name);
+			
 			printf("Keys for action after setting are %s\n", 	SDL_GetKeyName(keys_for_action[keys_for_action.size()-1][0]));
 		}
 		d->close();
@@ -116,9 +119,9 @@ void show_controls_dialog()
 	d.setBackgroundFrame("empty_window");
 	d.setDrawBackgroundFn(draw_last_scene);
 
-	ActionBindings engine_mapping = controls::engine_mappings;
+	ActionBindings *engine_mapping = controls::get_control_mappings();
 	// Store *all* action names, i.e. both engine mappings and module mappings
-	action_names = engine_mapping.get_action_names();
+	action_names = engine_mapping->get_action_names();
 	printf("Length of action names is %d\n", (int) action_names.size());
 	
 	for(auto p = action_names.begin(); p != action_names.end(); p++) {
@@ -127,7 +130,7 @@ void show_controls_dialog()
 		
 		std::string act_name = p->first.c_str();
 		
-		ComboList events = engine_mapping.get_keys_for_action(act_name);
+		ComboList events = engine_mapping->get_keys_for_action(act_name);
 		if(events.size() == 0){
 			continue;
 		}
@@ -135,8 +138,8 @@ void show_controls_dialog()
 		KeyButtons[act_name]->setDim(butt_width, butt_height);
 	}
 	
-	controls::ActionBindings module_mapping = *module::get_module_mappings();
-	std::map<std::string, std::string> module_action_names = module_mapping.get_action_names();
+	controls::ActionBindings *module_mapping = module::get_module_mappings();
+	std::map<std::string, std::string> module_action_names = module_mapping->get_action_names();
 	std::vector<std::string> list_of_module_action_names = {};
 	
 	for(auto p = module_action_names.begin(); p != module_action_names.end(); p++) {
@@ -146,7 +149,7 @@ void show_controls_dialog()
 		action_names[p->first] = p->second;
 		list_of_module_action_names.insert(list_of_module_action_names.begin(), p->first);
 		
-		ComboList events = module_mapping.get_keys_for_action(act_name);
+		ComboList events = module_mapping->get_keys_for_action(act_name);
 		if(events.size() == 0){
 			continue;
 		}

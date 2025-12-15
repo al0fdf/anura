@@ -244,7 +244,11 @@ namespace controls
 		static const char* names[] = { "up", "down", "left", "right", "attack", "jump", "tongue", "sprint", nullptr };
 		return names;
 	}
-
+	
+	controls::ActionBindings* get_control_mappings(){
+		return &engine_mappings;
+	}
+	
 	namespace {
 
 	variant g_user_ctrl_output;

@@ -539,8 +539,8 @@ int main(int argcount, char* argvec[])
 	try {
 		variant cfg = json::parse_from_file("data/controls.cfg");
 
-		controls::engine_mappings.parse_action_names(cfg["controls"]["names"]);
-		controls::engine_mappings.parse_keys(cfg["controls"]["key_bindings"]);
+		controls::get_control_mappings()->parse_action_names(cfg["controls"]["names"]);
+		controls::get_control_mappings()->parse_keys(cfg["controls"]["key_bindings"]);
 
 		//controls::parse_action_names(cfg["controls"]["names"]);
 		//controls::parse_keys_from_node_into_map(cfg["controls"]["key_bindings"], &controls::engine_keys);
