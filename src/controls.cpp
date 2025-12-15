@@ -88,8 +88,8 @@ namespace controls
 			this->key_mapping.insert({action_name, combo_list});
 		}
 	};
-
-	variant ActionBindings::get_keys_for_action(std::string action_name){
+	
+	variant ActionBindings::get_keys_for_action_ffl(std::string action_name){
 		std::vector<variant> result = {};
 
 		if (this->key_mapping.find(action_name) != this->key_mapping.end()) {
@@ -106,6 +106,17 @@ namespace controls
 	    }
 
 		return variant(&result);
+	}
+
+	ComboList ActionBindings::get_keys_for_action(std::string action_name){
+		ComboList result = {};
+
+		if (this->key_mapping.find(action_name) != this->key_mapping.end()) {
+			ComboList events = this->key_mapping[action_name];
+			return events;
+	    }
+
+		return result;
 	}
 
 	variant ActionBindings::add_key_for_action(std::string action_name, int before_index, KeyCombination value){
@@ -194,7 +205,7 @@ namespace controls
         	std::string preference_name = "keys_";
         	preference_name += action_name;
 
-         	node->add(preference_name, this->get_keys_for_action(action_name));
+         	node->add(preference_name, this->get_keys_for_action_ffl(action_name));
 		}
 	}
 

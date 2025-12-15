@@ -4476,13 +4476,13 @@ RETURN_TYPE("bool")
 
 	FUNCTION_DEF(get_keys_for_action, 1, 1, "get_keys_for_action(string) -> list: Prints the SDL keycodes configured for engine actions.")
 			std::string action_name = EVAL_ARG(0).as_string();
-
+			
 			if(controls::engine_mappings.has_action(action_name)){
-				return controls::engine_mappings.get_keys_for_action(action_name);
+				return controls::engine_mappings.get_keys_for_action_ffl(action_name);
 			} else {
-				return module::get_module_mappings()->get_keys_for_action(action_name);
+				return module::get_module_mappings()->get_keys_for_action_ffl(action_name);
 			}
-
+			
 			FUNCTION_ARGS_DEF
 				ARG_TYPE("string");
 			RETURN_TYPE("list");

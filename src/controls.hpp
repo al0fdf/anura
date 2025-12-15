@@ -58,7 +58,8 @@ namespace controls
 
 			void parse_action_names(variant node);
 			void parse_keys(variant node);
-			variant get_keys_for_action(std::string action_name);
+			ComboList get_keys_for_action(std::string action_name);
+			variant get_keys_for_action_ffl(std::string action_name);
 			variant add_key_for_action(std::string action_name, int before_index, KeyCombination value);
 			variant del_key_for_action(std::string action_name, int at_index);
 			std::map<std::string, std::string> get_action_names();
