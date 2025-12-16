@@ -36,6 +36,7 @@
 #include <SDL2/SDL_keycode.h>
 #include <map>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace
@@ -100,6 +101,14 @@ void show_controls_dialog()
 	const int vw = graphics::GameScreen::get().getVirtualWidth();
 	const int vh = graphics::GameScreen::get().getVirtualHeight();
 	
+	int sh = graphics::GameScreen::get().getHeight();
+	int sw = graphics::GameScreen::get().getWidth();
+	
+	int back_button_height = 60;
+	if(sh < 800){
+		back_button_height = 40;
+	}
+	
 	//HACK: 10 and 4 are the default button padding. Padding should be taken from buttons in KeyButtons list
 	int butt_padx = 10;
 	int butt_pady = 4;
@@ -108,19 +117,24 @@ void show_controls_dialog()
 	int butt_height = 60;
 
 	int butt_width_wp = butt_width + butt_padx;
-	int butt_height_wp = butt_height + butt_pady;
-	
-	int sep_y = 50;
+	int butt_height_wp = butt_height + butt_pady*3; //butt_pady*3*3 to add some extra padding for the label, and to make the grid look not as crammed
 
-	int height = vh- 20;
-	/*if(vh > 480) {
-		height -= 100;
-	}*/
-	Dialog d(200, (vh > 480) ? 60 : 10, vw - 400, height);
+	// Allow 3 buttons to fit onto dialog
+	// HACK: Make that larger, because the height is not large enough if we use 3. Don't know why (al0f)
+	int height = (butt_height_wp*5) + (back_button_height*2);
+	
+	// Allow 7 buttons horizontal to fit onto dialog
+	// HACK: Make that 8, because the width is not large enough if we use 7. Don't know why (al0f)
+	int width = butt_width_wp*8;
+	
+	// Center the dialog on screen
+	int dialog_x = (sw - width)/2;
+	int dialog_y = (sh - height)/2;
+	
+	Dialog d(dialog_x, dialog_y, width, height);
 	d.setBackgroundFrame("empty_window");
 	d.setDrawBackgroundFn(draw_last_scene);
 
-	int back_button_height = 60;
 	
 	WidgetPtr back_button(new Button(WidgetPtr(new GraphicalFontLabel(_("Back"), "door_label", 2)), std::bind(end_dialog, &d), BUTTON_STYLE_DEFAULT, BUTTON_SIZE_DOUBLE_RESOLUTION));
 	back_button->setDim(230, back_button_height);
@@ -141,12 +155,10 @@ void show_controls_dialog()
 		action_names[p->first] = p->second;
 	}
 	
+	std::map<std::string, std::vector<float>> menu_positions = controls::menu_positions;
+	
 	for(auto p = controls::menu_positions.begin(); p!= controls::menu_positions.end(); p++){
 		std::string act_name = p->first;
-		
-		printf("Action is %s\n", act_name.c_str());
-		printf("Position is %.2f %.2f\n", p->second[0], p->second[1]);
-		
 		
 		ComboList events = engine_mapping->get_keys_for_action(act_name);
 		ComboList events2 = module_mapping->get_keys_for_action(act_name);
