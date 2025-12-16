@@ -49,11 +49,10 @@ namespace
 		using namespace controls;
 		
 		// Loop through all actions and save their bindings
-		for(auto a = action_names.begin(); a != action_names.end(); a++) {
+		for(auto a = controls::menu_positions.begin(); a != controls::menu_positions.end(); a++) {
 			std::string act_name = a->first;
-			
-			printf("'Setting' key code of action %s to %d\n", act_name.c_str(), (int) KeyButtons[act_name]->get_key());
-			
+			printf("Action name is %s\n", act_name.c_str());
+			printf("Key buttons has length %d\n", (int)KeyButtons.size());
 			// Select the ActionBindings object which has the action we're referring to
 			ActionBindings *engine_mapping = controls::get_control_mappings();
 			controls::ActionBindings *module_mapping = module::get_module_mappings();
@@ -65,6 +64,10 @@ namespace
 				mapping = module_mapping;
 			}
 			
+			if(KeyButtons.find(act_name) == KeyButtons.end()){
+				printf("Remapping button for action '%s' not found. Skipping\n", act_name.c_str());
+				continue;
+			}
 			ComboList keys_for_action = mapping->get_keys_for_action(act_name);
 			
 			int old_key = keys_for_action[keys_for_action.size()-1][0];
@@ -73,21 +76,25 @@ namespace
 			
 			// Create a blank list into which we place the result from the button
 			std::vector<int> result;
+			
 			int new_key = KeyButtons[act_name]->get_key();
 			result.push_back(new_key);
+			
 			
 			// Mark the action as being modified from the default value if the keycodes do not match
 			// This is neccessary for the action to be saved to the preferences
 			if(new_key != old_key){
+				printf("Marking action %s as dirty.\n", act_name.c_str());
 				mapping->set_are_bindings_default(act_name, false);
 			}
 			
 			// Remove the last key binding, and then add it again with the new data 
 			keys_for_action[keys_for_action.size()-1] = result;
 			printf("Keys for action are %s\n", 	SDL_GetKeyName(keys_for_action[keys_for_action.size()-1][0]));
+			printf("Size is %d\n", (int)keys_for_action.size());
 			mapping->set_keys_for_action(act_name, keys_for_action);
 			keys_for_action = mapping->get_keys_for_action(act_name);
-			
+			printf("Size is %d\n", (int)keys_for_action.size());
 			printf("Keys for action after setting are %s\n", 	SDL_GetKeyName(keys_for_action[keys_for_action.size()-1][0]));
 		}
 		d->close();
@@ -149,7 +156,7 @@ void show_controls_dialog()
 	ActionBindings *module_mapping = module::get_module_mappings();
 	
 	std::map<std::string, std::string> engine_action_names = engine_mapping->get_action_names();
-	std::map<std::string, std::string> action_names = module_mapping->get_action_names();
+	action_names = module_mapping->get_action_names();
 	
 	for(auto p = engine_action_names.begin(); p != engine_action_names.end(); p++){
 		action_names[p->first] = p->second;
@@ -159,7 +166,7 @@ void show_controls_dialog()
 	
 	for(auto p = controls::menu_positions.begin(); p!= controls::menu_positions.end(); p++){
 		std::string act_name = p->first;
-		
+		printf("Spawning button for action %s\n", act_name.c_str());
 		ComboList events = engine_mapping->get_keys_for_action(act_name);
 		ComboList events2 = module_mapping->get_keys_for_action(act_name);
 		if(events.size() == 0 && events2.size() == 0){
