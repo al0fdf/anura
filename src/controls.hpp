@@ -88,6 +88,7 @@ namespace controls
 	
 	extern std::map<std::string, std::vector<float>> menu_positions;
 	bool read_menu_positions(variant node);
+	extern std::vector<int> dialog_grid_size;
 	
 	void set_mouse_to_keycode(CONTROL_ITEM item, int mouse_button);
 	CONTROL_ITEM get_mouse_keycode(int mouse_button);

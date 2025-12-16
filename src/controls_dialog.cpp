@@ -128,11 +128,11 @@ void show_controls_dialog()
 
 	// Allow 3 buttons to fit onto dialog
 	// HACK: Make that larger, because the height is not large enough if we use 3. Don't know why (al0f)
-	int height = (butt_height_wp*5) + (back_button_height*2);
+	int height = (butt_height_wp*controls::dialog_grid_size[1]) + (back_button_height*2);
 	
 	// Allow 7 buttons horizontal to fit onto dialog
 	// HACK: Make that 8, because the width is not large enough if we use 7. Don't know why (al0f)
-	int width = butt_width_wp*8;
+	int width = butt_width_wp*controls::dialog_grid_size[0];
 	
 	// Center the dialog on screen
 	int dialog_x = (sw - width)/2;

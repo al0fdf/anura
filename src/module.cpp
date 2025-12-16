@@ -532,6 +532,10 @@ namespace module
             if(v["controls"].has_key("positions")){
             	controls::read_menu_positions(v["controls"]["positions"]);
             }
+            
+            if(v["controls"].has_key("dialog_grid_size")){
+            	controls::dialog_grid_size = v["controls"]["dialog_grid_size"].as_list_int();
+            }
 
             m.module_mappings = module_mappings;
 		}

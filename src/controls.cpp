@@ -241,7 +241,7 @@ namespace controls
 	ActionBindings engine_mappings;
 	
 	std::map<std::string, std::vector<float>> menu_positions;
-	
+	std::vector<int> dialog_grid_size = {7, 6};
 	const char** control_names()
 	{
 		static const char* names[] = { "up", "down", "left", "right", "attack", "jump", "tongue", "sprint", nullptr };
