@@ -528,6 +528,10 @@ namespace module
             if(v["controls"].has_key("key_bindings")){
             	module_mappings.parse_keys(v["controls"]["key_bindings"]);
             }
+            
+            if(v["controls"].has_key("positions")){
+            	controls::read_menu_positions(v["controls"]["positions"]);
+            }
 
             m.module_mappings = module_mappings;
 		}

@@ -33,6 +33,7 @@
 #include "screen_handling.hpp"
 #include "widget_fwd.hpp"
 #include <SDL2/SDL_keyboard.h>
+#include <SDL2/SDL_keycode.h>
 #include <map>
 #include <string>
 #include <vector>
@@ -119,153 +120,66 @@ void show_controls_dialog()
 	d.setBackgroundFrame("empty_window");
 	d.setDrawBackgroundFn(draw_last_scene);
 
-	ActionBindings *engine_mapping = controls::get_control_mappings();
-	// Store *all* action names, i.e. both engine mappings and module mappings
-	action_names = engine_mapping->get_action_names();
-	printf("Length of action names is %d\n", (int) action_names.size());
+	int back_button_height = 60;
 	
-	for(auto p = action_names.begin(); p != action_names.end(); p++) {
-		printf("Adding button for action %s\n", p->first.c_str());
-		printf("Label for that action is %s\n", p->second.c_str());
+	WidgetPtr back_button(new Button(WidgetPtr(new GraphicalFontLabel(_("Back"), "door_label", 2)), std::bind(end_dialog, &d), BUTTON_STYLE_DEFAULT, BUTTON_SIZE_DOUBLE_RESOLUTION));
+	back_button->setDim(230, back_button_height);
+	d.addWidget(back_button, d.width()/2 - back_button->width()/2, back_button_height);
+	
+	
+	int left_edge = d.width()/16;
+
+	int reference_y = static_cast<int>(back_button->y() + back_button_height*2);
+	
+	ActionBindings *engine_mapping = controls::get_control_mappings();
+	ActionBindings *module_mapping = module::get_module_mappings();
+	
+	std::map<std::string, std::string> engine_action_names = engine_mapping->get_action_names();
+	std::map<std::string, std::string> action_names = module_mapping->get_action_names();
+	
+	for(auto p = engine_action_names.begin(); p != engine_action_names.end(); p++){
+		action_names[p->first] = p->second;
+	}
+	
+	for(auto p = controls::menu_positions.begin(); p!= controls::menu_positions.end(); p++){
+		std::string act_name = p->first;
 		
-		std::string act_name = p->first.c_str();
+		printf("Action is %s\n", act_name.c_str());
+		printf("Position is %.2f %.2f\n", p->second[0], p->second[1]);
+		
 		
 		ComboList events = engine_mapping->get_keys_for_action(act_name);
-		if(events.size() == 0){
-			continue;
-		}
-		KeyButtons[act_name] = KeyButtonPtr(new KeyButton(events[events.size()-1][0], BUTTON_SIZE_DOUBLE_RESOLUTION));
-		KeyButtons[act_name]->setDim(butt_width, butt_height);
-	}
-	
-	controls::ActionBindings *module_mapping = module::get_module_mappings();
-	std::map<std::string, std::string> module_action_names = module_mapping->get_action_names();
-	std::vector<std::string> list_of_module_action_names = {};
-	
-	for(auto p = module_action_names.begin(); p != module_action_names.end(); p++) {
-		// Populate the action names with the module actions as well
-		std::string act_name = p->first.c_str();
-		
-		action_names[p->first] = p->second;
-		list_of_module_action_names.insert(list_of_module_action_names.begin(), p->first);
-		
-		ComboList events = module_mapping->get_keys_for_action(act_name);
-		if(events.size() == 0){
-			continue;
-		}
-		KeyButtons[act_name] = KeyButtonPtr(new KeyButton(events[events.size()-1][0], BUTTON_SIZE_DOUBLE_RESOLUTION));
-		KeyButtons[act_name]->setDim(butt_width, butt_height);
-	}
-	
-	std::vector<WidgetPtr> module_buttons;
-	int row_width = 6;
-	
-	// Ceiling of integer division
-	int x = module_action_names.size();
-	int y = row_width;
-	
-	int number_of_rows = x / y + (x % y > 0);
-	
-	printf("Number of rows for module mappings is %d.\nNumber of module actions is %d\n", number_of_rows, (int)module_action_names.size());
-	
-	/*for(int n = 0; n < NUM_CONTROLS; ++n) {
-		const CONTROL_ITEM item = static_cast<CONTROL_ITEM>(n);
-		KeyButtons[item] = KeyButtonPtr(new KeyButton(get_keycode(item), BUTTON_SIZE_DOUBLE_RESOLUTION));
-		KeyButtons[item]->setDim(butt_width, butt_height);
-	}*/
-
-	WidgetPtr t_dirs(new GraphicalFontLabel(_("Directions"), "door_label", 2));
-	
-	WidgetPtr b_up(KeyButtons["up"]);
-	WidgetPtr b_down(KeyButtons["down"]);
-	WidgetPtr b_left(KeyButtons["left"]);
-	WidgetPtr b_right(KeyButtons["right"]);
-	WidgetPtr b_confirm(KeyButtons["confirm"]);
-	WidgetPtr b_cancel(KeyButtons["cancel"]);
-	
-	WidgetPtr t_confirm(new GraphicalFontLabel(_(action_names["confirm"]), "door_label", 2));
-	WidgetPtr t_cancel(new GraphicalFontLabel(_(action_names["cancel"]), "door_label", 2));
-	
-	/* Disable module-specific buttons for now
-	WidgetPtr t_jump(new GraphicalFontLabel(_("Jump"), "door_label", 2));
-	WidgetPtr b_jump(KeyButtons[CONTROL_JUMP]);
-	WidgetPtr t_tongue(new GraphicalFontLabel(_("Tongue"), "door_label", 2));
-	WidgetPtr b_tongue(KeyButtons[CONTROL_TONGUE]);
-	WidgetPtr t_item(new GraphicalFontLabel(_("Item"), "door_label", 2));
-	WidgetPtr b_item(KeyButtons[CONTROL_ATTACK]);
-	*/
-	
-	//WidgetPtr b_sprint(KeyButtons[CONTROL_SPRINT]);
-	//WidgetPtr t_sprint(new GraphicalFontLabel(_("Sprint"), "door_label", 2));
-
-	WidgetPtr back_button(new Button(WidgetPtr(new GraphicalFontLabel(_("Back"), "door_label", 2)), std::bind(end_dialog, &d), BUTTON_STYLE_DEFAULT, BUTTON_SIZE_DOUBLE_RESOLUTION));
-	back_button->setDim(230, 60);
-
-	
-	int top_label_height = d.padding();
-	int top_label_botm_edge = top_label_height+t_dirs->height();
-
-	int button_grid_width = 3*butt_width_wp;
-	int left_edge = d.width()/2 - button_grid_width/2;
-
-	int reference_y = static_cast<int>(d.padding() + butt_height_wp);
-	
-	// 'Directions' label
-	d.addWidget(t_dirs, static_cast<int>(left_edge), static_cast<int>(reference_y));
-	reference_y += t_dirs->height();
-
-	// Arrow keys
-	d.addWidget(b_up, static_cast<int>(left_edge+butt_width_wp), static_cast<int>(reference_y));
-	d.addWidget(b_left, static_cast<int>(left_edge), static_cast<int>(reference_y + butt_height_wp), Dialog::MOVE_DIRECTION::RIGHT);
-	d.addWidget(b_down, Dialog::MOVE_DIRECTION::RIGHT);
-	d.addWidget(b_right);
-	reference_y += butt_height_wp*2 + sep_y;
-
-	
-	// Confirm/Cancel labels
-	d.addWidget(t_confirm, left_edge, reference_y);
-	d.addWidget(t_cancel, static_cast<int>(left_edge+butt_width_wp), reference_y);
-	//d.addWidget(t_jump, left_edge, reference_y);
-	//d.addWidget(t_tongue, static_cast<int>(left_edge+butt_width_wp), reference_y);
-	//d.addWidget(t_item, static_cast<int>(left_edge+butt_width_wp*2), reference_y);
-	reference_y += t_confirm->height();
-
-	/*
-	d.addWidget(b_jump, left_edge, reference_y, Dialog::MOVE_DIRECTION::RIGHT);
-	d.addWidget(b_tongue, Dialog::MOVE_DIRECTION::RIGHT);
-	d.addWidget(b_item);
-	*/
-	
-	d.addWidget(b_confirm, left_edge, reference_y);
-	d.addWidget(b_cancel, static_cast<int>(left_edge+butt_width_wp), reference_y);
-	
-	reference_y += b_cancel->height();
-	
-	for(int y = 0; y<number_of_rows;y++){
-		for(int x = 0; x<row_width;x++){
-			int index = y*row_width + x;
-			if (index >= list_of_module_action_names.size()){
-				break;
+		ComboList events2 = module_mapping->get_keys_for_action(act_name);
+		if(events.size() == 0 && events2.size() == 0){
+			KeyButtons[act_name] = KeyButtonPtr(new KeyButton(SDLK_UNKNOWN, BUTTON_SIZE_DOUBLE_RESOLUTION));
+		} else {
+			if(engine_mapping->has_action(act_name)){
+				KeyButtons[act_name] = KeyButtonPtr(new KeyButton(events[events.size()-1][0], BUTTON_SIZE_DOUBLE_RESOLUTION));
+			} else {
+				KeyButtons[act_name] = KeyButtonPtr(new KeyButton(events2[events2.size()-1][0], BUTTON_SIZE_DOUBLE_RESOLUTION));
 			}
-			std::string act_name = list_of_module_action_names[index];
-			
-			WidgetPtr label(new GraphicalFontLabel(_(module_action_names[act_name].c_str()), "door_label", 2));
-			WidgetPtr button = KeyButtons[act_name.c_str()];
-			
-			int label_x = left_edge+butt_width_wp*x;
-			int label_y = reference_y;
-			
-			int button_y = reference_y + label->height();
-				
-			printf("Drawing button/label for x %d, y %d and index %d (with action name %s)\nAt position %d %d\n", x, y, index, act_name.c_str(), label_x, label_y);
-			
-			d.addWidget(label, label_x, label_y);
-			d.addWidget(button, label_x, button_y );
 		}
-		reference_y += butt_height_wp + sep_y;
+		
+		KeyButtons[act_name]->setDim(butt_width, butt_height);
+		
+		WidgetPtr label(new GraphicalFontLabel(_(action_names[act_name].c_str()), "door_label", 2));
+		WidgetPtr button = KeyButtons[act_name.c_str()];
+		
+		float grid_x = p->second[0];
+		float grid_y = p->second[1];
+		
+		int label_x = left_edge + butt_width_wp*grid_x;
+		int label_y = reference_y + (butt_height_wp+label->height())*grid_y;
+		
+		d.addWidget(label, label_x, label_y);
+		
+		int button_x = label_x;
+		//FIXME: Why doesn't the label return its actual height. I shouldn't need to multiply this by 2
+		int button_y = label_y + label->height();
+		
+		d.addWidget(button, button_x, button_y);
 	}
 	
-	d.addWidget(back_button, d.width()/2 - back_button->width()/2, reference_y);
 
 	d.showModal();
 }

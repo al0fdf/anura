@@ -21,6 +21,7 @@
 	   distribution.
 */
 
+#include "logger.hpp"
 #include "variant_type.hpp"
 #include <SDL2/SDL_keycode.h>
 #ifdef _MSC_VER
@@ -238,7 +239,9 @@ namespace controls
 	}
 
 	ActionBindings engine_mappings;
-
+	
+	std::map<std::string, std::vector<float>> menu_positions;
+	
 	const char** control_names()
 	{
 		static const char* names[] = { "up", "down", "left", "right", "attack", "jump", "tongue", "sprint", nullptr };
@@ -934,5 +937,30 @@ namespace controls
 			return sdlk[item];
 		}
 		return SDLK_UNKNOWN;
+	}
+	
+	bool read_menu_positions(variant node){
+		std::map<variant, variant> read_data = node.as_map();
+		if(read_data.size() == 0){
+			return false;
+		}
+		for(auto p = read_data.begin(); p != read_data.end(); ++p) {
+      		std::string action_name = p->first.as_string();
+        	std::vector<variant> position = p->second.as_list();
+         	std::vector<float> result;
+          	
+          	if(position.size() != 2){
+         		LOG_ERROR("Position for action '" << action_name << "' in module.cfg must be a list of two floats. [float x, float y]");
+           		continue;
+           	}
+          	float grid_x = position[0].as_float();
+           	float grid_y = position[1].as_float();
+         	
+            result.push_back(grid_x);
+            result.push_back(grid_y);
+         	
+        	menu_positions[action_name] = result;
+		}
+		return true;
 	}
 }
