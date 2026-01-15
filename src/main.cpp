@@ -545,33 +545,31 @@ int main(int argcount, char* argvec[])
 		
 		variant control_layout = ctrls["layout"];
 		
-		if (control_layout["dialog_grid_size"].is_null() == false){
-			controls::dialog_grid_size = control_layout["dialog_grid_size"].as_list_int();
-		}
-		if (control_layout["menu_positions"].is_null() == false){
-			std::map<std::string, std::vector<float>> menu_positions = {}; 
-			std::map<variant, variant> data = control_layout["menu_positions"].as_map();
-			
-			for(auto p = data.begin(); p != data.end(); ++p){
-				std::string act_id = p->first.as_string();
-				std::vector<variant> coordinates_variant = p->second.as_list();
-				
-				std::vector<float> coordinates = {};
-				
-				for(int i=0; i< coordinates_variant.size();i++){
-					float value = coordinates_variant[i].as_float();
-					coordinates.push_back(value);
-				}
-				
-				menu_positions.insert({act_id, coordinates});
+		if(controls::menu_positions.size() == 0){
+			if (control_layout["dialog_grid_size"].is_null() == false){
+				controls::dialog_grid_size = control_layout["dialog_grid_size"].as_list_int();
 			}
-			controls::menu_positions = menu_positions;
+		
+			if (control_layout["menu_positions"].is_null() == false){
+				std::map<std::string, std::vector<float>> menu_positions = {}; 
+				std::map<variant, variant> data = control_layout["menu_positions"].as_map();
+				
+				for(auto p = data.begin(); p != data.end(); ++p){
+					std::string act_id = p->first.as_string();
+					std::vector<variant> coordinates_variant = p->second.as_list();
+					
+					std::vector<float> coordinates = {};
+					
+					for(int i=0; i< coordinates_variant.size();i++){
+						float value = coordinates_variant[i].as_float();
+						coordinates.push_back(value);
+					}
+					
+					menu_positions.insert({act_id, coordinates});
+				}
+				controls::menu_positions = menu_positions;
+			}
 		}
-		
-		//std::vector<int> dialog_grid_size = {7, 6};
-		
-		//controls::parse_action_names(cfg["controls"]["names"]);
-		//controls::parse_keys_from_node_into_map(cfg["controls"]["key_bindings"], &controls::engine_keys);
 	} catch(const json::ParseError& error) {
 		LOG_ERROR(error.errorMessage());
 		return 1;
