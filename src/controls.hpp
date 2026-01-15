@@ -61,6 +61,7 @@ namespace controls
 			float get_strength();
 			int get_code();
 			variant as_variant();
+			static InputEvent from_variant(variant var);
 		private:
 			EventType type;
 			float strength;
@@ -74,6 +75,7 @@ namespace controls
 
 			void parse_action_names(variant node);
 			void parse_keys(variant node);
+			void parse_events(variant node);
 			ComboList get_keys_for_action(std::string action_name);
 			variant get_keys_for_action_ffl(std::string action_name);
 			variant add_key_for_action(std::string action_name, int before_index, KeyCombination value);

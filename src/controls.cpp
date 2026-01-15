@@ -114,7 +114,35 @@ namespace controls
 			this->action_names.insert({act_id, act_name});
 		}
 	};
-
+	
+	InputEvent InputEvent::from_variant(variant var) {
+		InputEvent::EventType type = InputEvent::EventType::KEYBOARD;
+		int code = 0;
+		float strength = 0.0;
+		
+		if (var.has_key("type")){
+			if(var["type"].as_string() == "keyboard"){
+				type = InputEvent::EventType::KEYBOARD;
+			} else if (var["type"].as_string() == "joypad_button"){
+				type = InputEvent::EventType::JOYPAD_BUTTON;
+			} else if (var["type"].as_string() == "joypad_motion"){
+				type = InputEvent::EventType::JOYPAD_MOTION;
+			}
+		}
+		
+		if (var.has_key("code")){
+			code = var["code"].as_int();
+		}
+		if (var.has_key("strength")){
+			strength = var["strength"].as_float();
+		}
+		
+		return InputEvent(type, code, strength);
+	};
+	
+	void ActionBindings::parse_events(variant node){
+	};
+	
 	void ActionBindings::parse_keys(variant node){
 		std::map<variant, variant> key_binds = node.as_map();
 		for(auto p = key_binds.begin(); p != key_binds.end(); ++p) {
