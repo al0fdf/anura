@@ -50,7 +50,23 @@ namespace controls
 	typedef std::vector<int> KeyCombination;
 	typedef std::vector<KeyCombination> ComboList;
 	typedef std::map<std::string, ComboList> KeyBindings;
-
+	
+	class InputEvent {
+		public:
+			enum EventType { KEYBOARD, JOYPAD_BUTTON, JOYPAD_MOTION };
+			InputEvent();
+			InputEvent(EventType type, int code, float strength);
+			~InputEvent();
+			EventType get_type();
+			float get_strength();
+			int get_code();
+			variant as_variant();
+		private:
+			EventType type;
+			float strength;
+			int code;
+	};
+	
 	class ActionBindings {
 		public:
 			ActionBindings();

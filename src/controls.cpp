@@ -50,6 +50,56 @@ PREF_INT(max_control_history, 1024, "Maximum number of frames to keep control hi
 
 namespace controls
 {
+	InputEvent::InputEvent(){
+		this->code = 0;
+		this->type = EventType::KEYBOARD;
+		this->strength = 0;
+	}
+	
+	InputEvent::InputEvent(EventType type, int code, float strength){
+		this->code = code;
+		this->type = type;
+		this->strength = strength;
+	}
+	
+	InputEvent::~InputEvent(){
+		
+	}
+	
+	InputEvent::EventType InputEvent::get_type(){
+		return this->type;
+	}
+	float InputEvent::get_strength(){
+		return this->strength;
+	}
+	int InputEvent::get_code(){
+		return this->code;
+	}
+	
+	variant InputEvent::as_variant(){
+		std::map<variant, variant> result = {};
+		variant v_type = variant("");
+		switch (this->type){
+			case EventType::KEYBOARD:
+				v_type = variant("keyboard");
+				break;
+			case EventType::JOYPAD_BUTTON:
+				v_type = variant("joypad_button");
+				break;
+			case EventType::JOYPAD_MOTION:
+				v_type = variant("joypad_motion");
+				break;
+			default:
+				v_type = variant("unknown");
+				break;
+		}
+		result.insert({variant("type"), v_type});
+		
+		result.insert({variant("code"), variant(this->code)});
+		result.insert({variant("strength"), variant(this->strength)});
+		return variant(&result);
+	}
+	
 	ActionBindings::ActionBindings(){
 	}
 	ActionBindings::~ActionBindings(){
