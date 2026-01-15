@@ -538,10 +538,38 @@ int main(int argcount, char* argvec[])
 	// Load control scheme from engine's config file
 	try {
 		variant cfg = json::parse_from_file("data/controls.cfg");
-
-		controls::get_control_mappings()->parse_action_names(cfg["controls"]["names"]);
-		controls::get_control_mappings()->parse_keys(cfg["controls"]["key_bindings"]);
-
+		variant ctrls = cfg["controls"];
+		
+		controls::get_control_mappings()->parse_action_names(ctrls["names"]);
+		controls::get_control_mappings()->parse_keys(ctrls["key_bindings"]);
+		
+		variant control_layout = ctrls["layout"];
+		
+		if (control_layout["dialog_grid_size"].is_null() == false){
+			controls::dialog_grid_size = control_layout["dialog_grid_size"].as_list_int();
+		}
+		if (control_layout["menu_positions"].is_null() == false){
+			std::map<std::string, std::vector<float>> menu_positions = {}; 
+			std::map<variant, variant> data = control_layout["menu_positions"].as_map();
+			
+			for(auto p = data.begin(); p != data.end(); ++p){
+				std::string act_id = p->first.as_string();
+				std::vector<variant> coordinates_variant = p->second.as_list();
+				
+				std::vector<float> coordinates = {};
+				
+				for(int i=0; i< coordinates_variant.size();i++){
+					float value = coordinates_variant[i].as_float();
+					coordinates.push_back(value);
+				}
+				
+				menu_positions.insert({act_id, coordinates});
+			}
+			controls::menu_positions = menu_positions;
+		}
+		
+		//std::vector<int> dialog_grid_size = {7, 6};
+		
 		//controls::parse_action_names(cfg["controls"]["names"]);
 		//controls::parse_keys_from_node_into_map(cfg["controls"]["key_bindings"], &controls::engine_keys);
 	} catch(const json::ParseError& error) {
