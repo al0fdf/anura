@@ -58,8 +58,6 @@ namespace module
 		std::vector<std::string> included_modules_;
 
 		variant default_preferences;
-
-		controls::ActionBindings module_mappings;
 	};
 
 
@@ -70,8 +68,6 @@ namespace module
 	//sets the core module name we are using. This MUST be called before
 	//using any other module functions to establish the dlc path we use.
 	void set_core_module_name(const std::string& module_name);
-
-	controls::ActionBindings* get_module_mappings();
 
 	const std::string get_module_name();
 	const std::string get_module_pretty_name();

@@ -518,15 +518,15 @@ namespace module
 		m.default_preferences = v["default_preferences"];
 		m.version_ = module_version;
 
-		controls::ActionBindings module_mappings;
+		controls::ActionBindings* module_mappings = controls::get_control_mappings();
 
 		if(v.has_key("controls")) {
     		if(v["controls"].has_key("names")){
-      			module_mappings.parse_action_names(v["controls"]["names"]);
+      			module_mappings->parse_action_names(v["controls"]["names"]);
      		}
 
             if(v["controls"].has_key("key_bindings")){
-            	module_mappings.parse_keys(v["controls"]["key_bindings"]);
+            	module_mappings->parse_keys(v["controls"]["key_bindings"]);
             }
             
             if(v["controls"].has_key("positions")){
@@ -536,8 +536,6 @@ namespace module
             if(v["controls"].has_key("dialog_grid_size")){
             	controls::dialog_grid_size = v["controls"]["dialog_grid_size"].as_list_int();
             }
-
-            m.module_mappings = module_mappings;
 		}
 
 
@@ -546,10 +544,6 @@ namespace module
 		if(initial) {
 			CustomObjectType::setPlayerVariantType(player_type);
 		}
-	}
-
-	controls::ActionBindings* get_module_mappings(){
-		return &loaded_paths().front().module_mappings;
 	}
 
 	std::string get_default_font()

@@ -55,20 +55,12 @@ namespace
 			printf("Key buttons has length %d\n", (int)KeyButtons.size());
 			// Select the ActionBindings object which has the action we're referring to
 			ActionBindings *engine_mapping = controls::get_control_mappings();
-			controls::ActionBindings *module_mapping = module::get_module_mappings();
-			ActionBindings *mapping;
-			
-			if(engine_mapping->has_action(act_name)){
-				mapping = engine_mapping;
-			} else {
-				mapping = module_mapping;
-			}
 			
 			if(KeyButtons.find(act_name) == KeyButtons.end()){
 				printf("Remapping button for action '%s' not found. Skipping\n", act_name.c_str());
 				continue;
 			}
-			ComboList keys_for_action = mapping->get_keys_for_action(act_name);
+			ComboList keys_for_action = engine_mapping->get_keys_for_action(act_name);
 			
 			int old_key = keys_for_action[keys_for_action.size()-1][0];
 			printf("Last key for action is %s\n", SDL_GetKeyName(old_key));
@@ -85,15 +77,15 @@ namespace
 			// This is neccessary for the action to be saved to the preferences
 			if(new_key != old_key){
 				printf("Marking action %s as dirty.\n", act_name.c_str());
-				mapping->set_are_bindings_default(act_name, false);
+				engine_mapping->set_are_bindings_default(act_name, false);
 			}
 			
 			// Remove the last key binding, and then add it again with the new data 
 			keys_for_action[keys_for_action.size()-1] = result;
 			printf("Keys for action are %s\n", 	SDL_GetKeyName(keys_for_action[keys_for_action.size()-1][0]));
 			printf("Size is %d\n", (int)keys_for_action.size());
-			mapping->set_keys_for_action(act_name, keys_for_action);
-			keys_for_action = mapping->get_keys_for_action(act_name);
+			engine_mapping->set_keys_for_action(act_name, keys_for_action);
+			keys_for_action = engine_mapping->get_keys_for_action(act_name);
 			printf("Size is %d\n", (int)keys_for_action.size());
 			printf("Keys for action after setting are %s\n", 	SDL_GetKeyName(keys_for_action[keys_for_action.size()-1][0]));
 		}
@@ -153,14 +145,8 @@ void show_controls_dialog()
 	int reference_y = static_cast<int>(back_button->y() + back_button_height*2);
 	
 	ActionBindings *engine_mapping = controls::get_control_mappings();
-	ActionBindings *module_mapping = module::get_module_mappings();
 	
-	std::map<std::string, std::string> engine_action_names = engine_mapping->get_action_names();
-	action_names = module_mapping->get_action_names();
-	
-	for(auto p = engine_action_names.begin(); p != engine_action_names.end(); p++){
-		action_names[p->first] = p->second;
-	}
+	std::map<std::string, std::string> action_names = engine_mapping->get_action_names();
 	
 	std::map<std::string, std::vector<float>> menu_positions = controls::menu_positions;
 	
@@ -168,14 +154,11 @@ void show_controls_dialog()
 		std::string act_name = p->first;
 		printf("Spawning button for action %s\n", act_name.c_str());
 		ComboList events = engine_mapping->get_keys_for_action(act_name);
-		ComboList events2 = module_mapping->get_keys_for_action(act_name);
-		if(events.size() == 0 && events2.size() == 0){
+		if(events.size() == 0){
 			KeyButtons[act_name] = KeyButtonPtr(new KeyButton(SDLK_UNKNOWN, BUTTON_SIZE_DOUBLE_RESOLUTION));
 		} else {
 			if(engine_mapping->has_action(act_name)){
 				KeyButtons[act_name] = KeyButtonPtr(new KeyButton(events[events.size()-1][0], BUTTON_SIZE_DOUBLE_RESOLUTION));
-			} else {
-				KeyButtons[act_name] = KeyButtonPtr(new KeyButton(events2[events2.size()-1][0], BUTTON_SIZE_DOUBLE_RESOLUTION));
 			}
 		}
 		
