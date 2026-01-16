@@ -84,10 +84,10 @@ namespace controls
 				v_type = variant("keyboard");
 				break;
 			case EventType::JOYPAD_BUTTON:
-				v_type = variant("joypad_button");
+				v_type = variant("joy_button");
 				break;
 			case EventType::JOYPAD_MOTION:
-				v_type = variant("joypad_motion");
+				v_type = variant("joy_motion");
 				break;
 			default:
 				v_type = variant("unknown");
@@ -123,9 +123,9 @@ namespace controls
 		if (var.has_key("type")){
 			if(var["type"].as_string() == "keyboard"){
 				type = InputEvent::EventType::KEYBOARD;
-			} else if (var["type"].as_string() == "joypad_button"){
+			} else if (var["type"].as_string() == "joy_button"){
 				type = InputEvent::EventType::JOYPAD_BUTTON;
-			} else if (var["type"].as_string() == "joypad_motion"){
+			} else if (var["type"].as_string() == "joy_motion"){
 				type = InputEvent::EventType::JOYPAD_MOTION;
 			}
 		}
