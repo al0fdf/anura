@@ -4474,43 +4474,15 @@ RETURN_TYPE("bool")
 		RETURN_TYPE("string");
 	END_FUNCTION_DEF(sdl_key_to_name)
 
-	FUNCTION_DEF(get_keys_for_action, 1, 1, "get_keys_for_action(string) -> list: Prints the SDL keycodes configured for engine actions.")
+	FUNCTION_DEF(get_events_for_action, 1, 1, "get_events_for_action(string) -> list: Returns a list of event combinations configured for an action.")
 			std::string action_name = EVAL_ARG(0).as_string();
 			
-			return controls::get_control_mappings()->get_keys_for_action_ffl(action_name);
+			return controls::get_control_mappings()->get_events_for_action_ffl(action_name);
 			
 			FUNCTION_ARGS_DEF
 				ARG_TYPE("string");
 			RETURN_TYPE("list");
-	END_FUNCTION_DEF(get_keys_for_action)
-
-	FUNCTION_DEF(add_key_for_action, 3, 3, "add_key_for_action(string action_name, int index_before, list[int] value: Adds the key binding 'value' for action_name")
-		std::string action_name = EVAL_ARG(0).as_string();
-		int index = EVAL_ARG(1).as_int();
-		variant value = EVAL_ARG(2);
-
-		std::vector<int> c_value = value.as_list_int();
-
-		return controls::get_control_mappings()->add_key_for_action(action_name, index, c_value);
-		
-		FUNCTION_ARGS_DEF
-			ARG_TYPE("string");
-			ARG_TYPE("int");
-			ARG_TYPE("list");
-		RETURN_TYPE("bool");
-	END_FUNCTION_DEF(add_key_for_action)
-
-	FUNCTION_DEF(del_key_for_action, 2, 2, "del_key_for_action(string action_name, int index_at): Deletes the given key binding for action_name")
-		std::string action_name = EVAL_ARG(0).as_string();
-		int index = EVAL_ARG(1).as_int();
-
-		return controls::get_control_mappings()->del_key_for_action(action_name, index);
-
-		FUNCTION_ARGS_DEF
-			ARG_TYPE("string");
-			ARG_TYPE("int");
-		RETURN_TYPE("bool");
-	END_FUNCTION_DEF(del_key_for_action)
+	END_FUNCTION_DEF(get_events_for_action)
 
 	FUNCTION_DEF(eval, 1, 2, "eval(str, [arg map]): evaluate the given string as FFL")
 		variant s = EVAL_ARG(0);

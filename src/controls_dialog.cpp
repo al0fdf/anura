@@ -60,10 +60,11 @@ namespace
 				printf("Remapping button for action '%s' not found. Skipping\n", act_name.c_str());
 				continue;
 			}
-			ComboList keys_for_action = engine_mapping->get_keys_for_action(act_name);
+			EventComboList keys_for_action = engine_mapping->get_events_for_action(act_name);
 			
-			int old_key = keys_for_action[keys_for_action.size()-1][0];
-			printf("Last key for action is %s\n", SDL_GetKeyName(old_key));
+			//TODO: Adapt to new events systems
+			/*int old_key = keys_for_action[keys_for_action.size()-1][0];
+			//printf("Last key for action is %s\n", SDL_GetKeyName(old_key));
 			
 			
 			// Create a blank list into which we place the result from the button
@@ -88,6 +89,7 @@ namespace
 			keys_for_action = engine_mapping->get_keys_for_action(act_name);
 			printf("Size is %d\n", (int)keys_for_action.size());
 			printf("Keys for action after setting are %s\n", 	SDL_GetKeyName(keys_for_action[keys_for_action.size()-1][0]));
+			*/
 		}
 		d->close();
 	}
@@ -153,14 +155,15 @@ void show_controls_dialog()
 	for(auto p = controls::menu_positions.begin(); p!= controls::menu_positions.end(); p++){
 		std::string act_name = p->first;
 		printf("Spawning button for action %s\n", act_name.c_str());
-		ComboList events = engine_mapping->get_keys_for_action(act_name);
-		if(events.size() == 0){
+		//TODO: Adapt to new events system
+		/*ComboList events = engine_mapping->get_keys_for_action(act_name);
+		if(events.size() == 0){*/
 			KeyButtons[act_name] = KeyButtonPtr(new KeyButton(SDLK_UNKNOWN, BUTTON_SIZE_DOUBLE_RESOLUTION));
-		} else {
+		/*} else {
 			if(engine_mapping->has_action(act_name)){
 				KeyButtons[act_name] = KeyButtonPtr(new KeyButton(events[events.size()-1][0], BUTTON_SIZE_DOUBLE_RESOLUTION));
 			}
-		}
+			}*/
 		
 		KeyButtons[act_name]->setDim(butt_width, butt_height);
 		

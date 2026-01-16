@@ -166,61 +166,6 @@ namespace controls
 		}
 	};
 	
-	void ActionBindings::parse_keys(variant node){
-		std::map<variant, variant> key_binds = node.as_map();
-		for(auto p = key_binds.begin(); p != key_binds.end(); ++p) {
-		    std::string action_name = p->first.as_string();
-			ComboList combo_list;
-
-			std::vector<variant> key_sequences = p->second.as_list();
-			for(int i=0;i<key_sequences.size();i++){
-				std::vector<std::string> key_combo = key_sequences[i].as_list_string();
-				KeyCombination kb;
-
-				for(int j=0;j<key_combo.size();j++){
-					const char* key_name = key_combo[j].c_str();
-					int keycode = SDL_GetKeyFromName(key_name);
-					//TODO: Handle 'unknown' key
-					if(keycode != SDLK_UNKNOWN){
-						kb.push_back(keycode);
-					}
-				}
-				combo_list.push_back(kb);
-			}
-			this->key_mapping.insert({action_name, combo_list});
-		}
-	};
-	
-	variant ActionBindings::get_keys_for_action_ffl(std::string action_name){
-		std::vector<variant> result = {};
-
-		if (this->key_mapping.find(action_name) != this->key_mapping.end()) {
-			ComboList events = this->key_mapping[action_name];
-			for(int i=0;i<events.size();i++){
-				KeyCombination kb;
-				kb = events[i];
-				std::vector<variant> tmp = {};
-				for(int j=0;j<kb.size();j++){
-					tmp.push_back(variant(kb[j]));
-				}
-				result.emplace_back(variant(&tmp));
-			}
-	    }
-
-		return variant(&result);
-	}
-
-	ComboList ActionBindings::get_keys_for_action(std::string action_name){
-		ComboList result = {};
-
-		if (this->key_mapping.find(action_name) != this->key_mapping.end()) {
-			ComboList events = this->key_mapping[action_name];
-			return events;
-	    }
-
-		return result;
-	}
-	
 	variant ActionBindings::get_events_for_action_ffl(std::string action_name){
 		EventComboList event_combos = this->get_events_for_action(action_name); //List of event combos
 		std::vector<variant> result = {};
@@ -246,57 +191,12 @@ namespace controls
 		return result;
 	}
 
-	variant ActionBindings::add_key_for_action(std::string action_name, int before_index, KeyCombination value){
-		if (this->key_mapping.find(action_name) != this->key_mapping.end()) {
-			ComboList events = this->key_mapping[action_name];
-
-			KeyCombination k;
-			for(int i=0;i<value.size();i++){
-				k.push_back(value[i]);
-			}
-
-			std::vector<int> temp = k;
-			if(before_index >= events.size() && before_index != 0){
-				// List index out of range
-				return variant::from_bool(false);
-			}
-			events.insert(events.begin() + before_index, temp);
-			this->key_mapping[action_name] = events;
-
-			// Assign back the modified array
-			this->dirty_actions[action_name] = true;
-			return variant::from_bool(true);
-		}
-		return variant::from_bool(false);
-	}
-
-	variant ActionBindings::del_key_for_action(std::string action_name, int at_index){
-		if (this->key_mapping.find(action_name) != this->key_mapping.end()) {
-			ComboList events = this->key_mapping[action_name];
-
-			if(at_index >= events.size()){
-				// List index out of range
-				return variant::from_bool(false);
-			}
-			//TODO: Determine if the allocated memory for the KeyCombo at events[at_index] will be
-			// automatically freed
-			events.erase(events.begin() + at_index);
-
-			// Assign back the modified array
-			this->key_mapping[action_name] = events;
-
-			this->dirty_actions[action_name] = true;
-			return variant::from_bool(true);
-		}
-		return variant::from_bool(false);
-	}
-
 	std::map<std::string, std::string> ActionBindings::get_action_names(){
 		return action_names;
 	}
 
-	void ActionBindings::set_keys_for_action(std::string action, ComboList &combos){
-		this->key_mapping[action] = combos;
+	void ActionBindings::set_events_for_action(std::string action, EventComboList &combos){
+		this->event_mapping[action] = combos;
 	}
 
 	bool ActionBindings::has_action(std::string action_name){
@@ -317,7 +217,6 @@ namespace controls
 	}
 
 	bool ActionBindings::are_bindings_default_for_action(std::string action_name){
-		return false;
 		if (this->dirty_actions.find(action_name) == this->dirty_actions.end()) {
 			return true;
 		}
@@ -365,7 +264,7 @@ namespace controls
               	}
 
               	// Assign the new bindings
-               	printf("%s\n", "TODO: Assign the new bindings which we read from preferences!");
+               	this->set_events_for_action(action_name, events);
 			}
 		}
 	}
