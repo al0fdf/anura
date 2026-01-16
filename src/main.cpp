@@ -541,7 +541,11 @@ int main(int argcount, char* argvec[])
 		variant ctrls = cfg["controls"];
 		
 		controls::get_control_mappings()->parse_action_names(ctrls["names"]);
-		controls::get_control_mappings()->parse_keys(ctrls["key_bindings"]);
+		LOG_INFO("Main has read control names");
+		controls::get_control_mappings()->parse_events(ctrls["key_bindings"]);
+		LOG_INFO("Main has read key bindings");
+		controls::get_control_mappings()->parse_events(ctrls["button_bindings"]);
+		LOG_INFO("Main has read button bindings");
 		
 		variant control_layout = ctrls["layout"];
 		

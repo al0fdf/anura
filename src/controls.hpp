@@ -50,6 +50,11 @@ namespace controls
 	typedef std::vector<int> KeyCombination;
 	typedef std::vector<KeyCombination> ComboList;
 	typedef std::map<std::string, ComboList> KeyBindings;
+	class InputEvent;
+	
+	typedef std::vector<InputEvent> EventCombo;
+	typedef std::vector<EventCombo> EventComboList;
+	typedef std::map<std::string, EventComboList> EventBindings;
 	
 	class InputEvent {
 		public:
@@ -77,7 +82,10 @@ namespace controls
 			void parse_keys(variant node);
 			void parse_events(variant node);
 			ComboList get_keys_for_action(std::string action_name);
+			EventComboList get_events_for_action(std::string action_name);
+			
 			variant get_keys_for_action_ffl(std::string action_name);
+			variant get_events_for_action_ffl(std::string action_name);
 			variant add_key_for_action(std::string action_name, int before_index, KeyCombination value);
 			variant del_key_for_action(std::string action_name, int at_index);
 			std::map<std::string, std::string> get_action_names();
@@ -93,6 +101,7 @@ namespace controls
 			void read_from_preferences(variant node);
 		private:
 			KeyBindings key_mapping;
+			EventBindings event_mapping;
 			//To store if a user has changed an action's binds from the default
 			std::map<std::string, bool> dirty_actions;
 			std::map<std::string, std::string> action_names;

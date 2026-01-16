@@ -38,6 +38,7 @@
 #include "formula_constants.hpp"
 #include "http_client.hpp"
 #include "json_parser.hpp"
+#include "logger.hpp"
 #include "md5.hpp"
 #include "module.hpp"
 #include "preferences.hpp"
@@ -407,9 +408,6 @@ namespace module
 		auto speech_dialog_bg_color = std::make_shared<KRE::Color>(58, 61, 76, 255);
 		variant player_type;
 
-		std::map<std::string, controls::ComboList> module_keys = {};
-		std::map<std::string, std::string> action_names = {};
-
 		const std::string constants_path = make_base_module_path(name) + "data/constants.cfg";
 		if(sys::file_exists(constants_path)) {
 			const std::string contents = sys::read_file(constants_path);
@@ -522,18 +520,26 @@ namespace module
 
 		if(v.has_key("controls")) {
     		if(v["controls"].has_key("names")){
+      			LOG_INFO("Module has read control names");
       			module_mappings->parse_action_names(v["controls"]["names"]);
      		}
 
             if(v["controls"].has_key("key_bindings")){
-            	module_mappings->parse_keys(v["controls"]["key_bindings"]);
+           		LOG_INFO("Module has read key bindings");
+            	module_mappings->parse_events(v["controls"]["key_bindings"]);
+            }
+            if(v["controls"].has_key("button_bindings")){
+            	LOG_INFO("Module has read button bindings");
+            	module_mappings->parse_events(v["controls"]["button_bindings"]);
             }
             
             if(v["controls"].has_key("positions")){
+            	LOG_INFO("Module has read control positions");
             	controls::read_menu_positions(v["controls"]["positions"]);
             }
             
             if(v["controls"].has_key("dialog_grid_size")){
+            	LOG_INFO("Module has read dialog grid size");
             	controls::dialog_grid_size = v["controls"]["dialog_grid_size"].as_list_int();
             }
 		}

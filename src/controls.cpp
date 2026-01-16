@@ -141,6 +141,29 @@ namespace controls
 	};
 	
 	void ActionBindings::parse_events(variant node){
+		std::map<variant, variant> event_binds = node.as_map(); //Action name to list of list of events
+		for(auto p = event_binds.begin(); p != event_binds.end(); ++p){
+			std::string action_name = p->first.as_string(); //Action names
+			
+			
+			std::vector<variant> event_sequences = p->second.as_list(); // List of event combo
+			EventComboList combo_list = {};
+			for(int i=0;i<event_sequences.size();i++){
+				std::vector<variant> ffl_event_combo = event_sequences[i].as_list(); //List of events
+				EventCombo event_combo = {};
+				
+				for(int q=0;q<ffl_event_combo.size();q++){
+					LOG_INFO(ffl_event_combo[q]);
+					InputEvent event = InputEvent::from_variant(ffl_event_combo[q]);
+					event_combo.push_back(event);
+				}
+				combo_list.push_back(event_combo);
+			}
+			
+			for(int j=0;j<combo_list.size();j++){
+				this->event_mapping[action_name].push_back(combo_list[j]);
+			}
+		}
 	};
 	
 	void ActionBindings::parse_keys(variant node){
@@ -195,6 +218,31 @@ namespace controls
 			return events;
 	    }
 
+		return result;
+	}
+	
+	variant ActionBindings::get_events_for_action_ffl(std::string action_name){
+		EventComboList event_combos = this->get_events_for_action(action_name); //List of event combos
+		std::vector<variant> result = {};
+		
+		for(int i=0;i<event_combos.size();i++){
+			std::vector<variant> combo;   // An 'event combo' i.e. list of events
+			for(int j=0;j<event_combos[i].size();j++){
+				combo.push_back(event_combos[i][j].as_variant());
+			}
+			result.push_back(variant(&combo));
+		}
+		
+		return variant(&result);
+	}
+	
+	EventComboList ActionBindings::get_events_for_action(std::string action_name){
+		if (this->event_mapping.find(action_name) != this->event_mapping.end()) {
+			EventComboList events = this->event_mapping[action_name];
+			return events;
+		}
+		
+		EventComboList result = {};
 		return result;
 	}
 
@@ -269,6 +317,7 @@ namespace controls
 	}
 
 	bool ActionBindings::are_bindings_default_for_action(std::string action_name){
+		return false;
 		if (this->dirty_actions.find(action_name) == this->dirty_actions.end()) {
 			return true;
 		}
@@ -281,37 +330,42 @@ namespace controls
         	if(this->are_bindings_default_for_action(action_name)){
          		continue;
          	}
-        	std::string preference_name = "keys_";
+        	std::string preference_name = "events_";
         	preference_name += action_name;
 
-         	node->add(preference_name, this->get_keys_for_action_ffl(action_name));
+         	node->add(preference_name, this->get_events_for_action_ffl(action_name));
 		}
 	}
 
 	void ActionBindings::read_from_preferences(variant node){
 		for(auto p = action_names.begin(); p != action_names.end(); ++p) {
       		std::string action_name = p->first;
-        	std::string preference_name = "keys_";
+        	std::string preference_name = "events_";
         	preference_name += action_name;
 
          	// For each 'keys_action' that is found in preferences.cfg
-        	const variant keys_node = node[preference_name];
-         	if(keys_node.is_null() == false) {
+        	const variant events_node = node[preference_name];
+         	if(events_node.is_null() == false) {
           		// Mark action as dirty, i.e. changed from default
           		this->set_are_bindings_default(action_name, false);
 
             	// Parse the data (key combinations) from variants
              	// to the KeyCombination type.
-            	controls::ComboList combos;
-            	std::vector<variant> temp = keys_node.as_list();
+             	EventComboList events;
+              	
+            	std::vector<variant> temp = events_node.as_list(); // List of list of events
              	for(int i=0;i<temp.size();i++){
-              		controls::KeyCombination key_combo;
-               		key_combo = temp[i].as_list_int();
-            		combos.push_back(key_combo);
+            		EventCombo event_combo = {};
+              		std::vector<variant> ffl_event_combo = temp[i].as_list();//List of events
+                	for(int j=0;j<ffl_event_combo.size();j++){
+               			InputEvent event = InputEvent::from_variant(ffl_event_combo[j]);
+                		event_combo.push_back(event);
+                 	}
+                 	events.push_back(event_combo);
               	}
 
               	// Assign the new bindings
-              	this->set_keys_for_action(action_name, combos);
+               	printf("%s\n", "TODO: Assign the new bindings which we read from preferences!");
 			}
 		}
 	}
