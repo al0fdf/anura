@@ -279,6 +279,54 @@ namespace controls
 		return names;
 	}
 	
+	bool is_action_down(std::string action_name){
+		EventComboList combos = engine_mappings.get_events_for_action(action_name);
+		
+		for(int i=0;i<combos.size();i++){
+			EventCombo combo = combos[i];
+			bool is_match = true;
+			
+			for(int j=0;j<combo.size();j++){
+				InputEvent ev = combo[j];
+				switch(ev.get_type()){
+					case InputEvent::EventType::KEYBOARD: 
+						{
+							int keycode = ev.get_code();
+							int scancode = SDL_GetScancodeFromKey(keycode);
+							int numkeys;
+							const Uint8* states = SDL_GetKeyboardState(&numkeys);
+							if (scancode > numkeys){
+								is_match = false;
+							}
+							if(states[scancode] == 0){
+								is_match = false;
+							}
+						}
+						break;
+					case InputEvent::EventType::JOYPAD_BUTTON:
+						{
+							int button_index = ev.get_code();
+							if(not joystick::button((SDL_GameControllerButton) button_index)){
+								is_match = false;
+							}
+						}
+						break;
+					case InputEvent::EventType::JOYPAD_MOTION:
+						break;
+				}
+				if(is_match == false){
+					break; // Break out of 'for event in combo' loop
+				}
+			}
+			// Wait until all events in the combo have been confirmed
+			// for example if an event combo is [Ctrl, P], then both Ctrl
+			// and P have to have is_match=true
+			if (is_match) {
+				return true;
+			}
+		}
+	}
+	
 	controls::ActionBindings* get_control_mappings(){
 		return &engine_mappings;
 	}

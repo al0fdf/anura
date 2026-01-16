@@ -123,7 +123,8 @@ namespace controls
 
 	void set_keycode(CONTROL_ITEM item, key_type key);
 	key_type get_keycode(CONTROL_ITEM item);
-
+	
+	bool is_action_down(std::string action_name);
 	void new_level(int starting_cycle, int nplayers, int local_player);
 
 	//an object which can lock controls into a specific state for the duration
