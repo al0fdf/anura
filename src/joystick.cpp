@@ -22,6 +22,7 @@
 */
 
 
+#include <SDL2/SDL_gamecontroller.h>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -335,7 +336,40 @@ namespace joystick
 
 		return false;
 	}
+	
+	//Similar to `bool button(int n)`, but directly uses the
+	// 'SDL_GameControllerButton' enum
+	bool button_raw(SDL_GameControllerButton n){
+		if(!preferences::use_joystick()) {
+			return false;
+		}
+		
+		//Loop through controllers
+		for(auto gc : game_controllers) {
+			Uint8 state = 0;
+			
+			// Check if the button with index 'n' is pressed
+			state = SDL_GameControllerGetButton(gc.second.get(), n);
+			if(state != 0) {
+				return true;
+			}
+		}
+		
+		// This is copied from the button() method.
+		// I do not know what this is for, but probably
+		// best to include it - al2f, 07/02/2026
+		for(auto j : joysticks) {
+			if(n >= SDL_JoystickNumButtons(j.get())) {
+				continue;
+			}
+			if(SDL_JoystickGetButton(j.get(), (int)n)) {
+				return true;
+			}
+		}
 
+		return false;
+	}
+	
 	bool button(int n)
 	{
 		if(!preferences::use_joystick()) {

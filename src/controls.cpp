@@ -24,6 +24,8 @@
 #include "logger.hpp"
 #include "variant_type.hpp"
 #include <SDL2/SDL_keycode.h>
+#include <map>
+#include <string>
 #ifdef _MSC_VER
 #include <winsock2.h>
 #else
@@ -306,12 +308,13 @@ namespace controls
 					case InputEvent::EventType::JOYPAD_BUTTON:
 						{
 							int button_index = ev.get_code();
-							if(not joystick::button((SDL_GameControllerButton) button_index)){
+							if(not joystick::button_raw((SDL_GameControllerButton) button_index)){
 								is_match = false;
 							}
 						}
 						break;
 					case InputEvent::EventType::JOYPAD_MOTION:
+						//TODO: Handle axes
 						break;
 				}
 				if(is_match == false){
@@ -325,6 +328,7 @@ namespace controls
 				return true;
 			}
 		}
+		return false;
 	}
 	
 	controls::ActionBindings* get_control_mappings(){
@@ -353,8 +357,10 @@ namespace controls
 
 		unsigned char keys;
 		std::string user;
+		std::map<std::string, bool> actions;
 	};
-
+	
+	// A vector for each player. Each vector contains a list of controlFrames. One ControlFrame per cycle.
 	std::vector<ControlFrame> controls[MAX_PLAYERS];
 
 	//for each player, the highest confirmed cycle we have
@@ -569,7 +575,6 @@ namespace controls
 		if(local_player >= nplayers) {
 			return;
 		}
-
 		ControlFrame state;
 		if(local_control_locks.empty()) {
 			bool ignore_keypresses = false;
@@ -579,6 +584,18 @@ namespace controls
 					ignore_keypresses = true;
 					break;
 				}
+			}
+			
+			std::map<std::string, std::string> action_names = engine_mappings.get_action_names();
+			for(auto p = action_names.begin(); p!=action_names.end();++p){
+				std::string act_name = p->first;
+				
+				if(is_action_down(act_name)){
+					state.actions[act_name] = true;
+				} else {
+					state.actions[act_name] = false;
+				}
+				
 			}
 
 			Uint32 mouse_buttons = SDL_GetMouseState(nullptr, nullptr);
@@ -678,6 +695,7 @@ namespace controls
 
 	void get_controlStatus(int cycle, int player, bool* output, const std::string** user)
 	{
+		//NOTE: Possible place for updating frogatto's input state based on actions. - al2f
 		--cycle;
 		cycle -= starting_cycles;
 

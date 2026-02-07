@@ -418,6 +418,7 @@ private:
 
 	std::vector<ScheduledCommand> scheduled_commands_;
 
+	// a boolean list which holds the state(true/false) of each action(e.g. CONTROL_ATTACK or CONTROL_SPRINT).
 	bool controls_[controls::NUM_CONTROLS];
 	variant controls_user_;
 

@@ -44,6 +44,7 @@ namespace joystick
 	bool right();
 
 	bool button(int n);
+	bool button_raw(SDL_GameControllerButton n);
 
 	int iphone_tilt();
 
