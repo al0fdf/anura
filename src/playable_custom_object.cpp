@@ -28,6 +28,7 @@
 #include "custom_object_callable.hpp"
 #include "difficulty.hpp"
 #include "formatter.hpp"
+#include "logger.hpp"
 #include "preferences.hpp"
 #include "input.hpp"
 #include "joystick.hpp"
@@ -193,6 +194,9 @@ void PlayableCustomObject::process(Level& lvl)
 		for(auto p =act_state.begin();p != act_state.end();p++){
 			temp[variant(p->first)] = variant(p->second);
 		}
+		//TODO: remove.
+		// Proof that ctrl_actions_ should not be null
+		// LOG_INFO(variant(&temp));
 		ctrl_actions_ = variant(&temp);
 		
 		// XX Need to abstract this to read controls and mappings from global game file.
@@ -345,6 +349,7 @@ variant PlayableCustomObject::getPlayerValueBySlot(int slot) const
 
 	}
 	case CUSTOM_OBJECT_PLAYER_CTRL_ACTIONS: {
+		LOG_INFO(ctrl_actions_);
 		if(ctrl_actions_.is_null()) {
 			std::map<variant, variant> res;
 			return variant(&res);

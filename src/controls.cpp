@@ -699,11 +699,13 @@ namespace controls
 		//NOTE: copying function definition from get_controlStatus for input remap stage 4
 		// again, cycle and/or user might not be needed if multiplayer logic is ripped out - al2f
 		// 
-		// --cycle;
+		--cycle;
 		cycle -= starting_cycles;
 
 		cycle -= delay;
-		
+		if(cycle < 0) {
+			return {};
+		}
 		// Return the action state from the current frame
 		ASSERT_INDEX_INTO_VECTOR(cycle, controls[player]);
 		std::map<std::string, bool> action_state = controls[player][cycle].actions;
