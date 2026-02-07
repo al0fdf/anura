@@ -26,6 +26,7 @@
 
 #include "Canvas.hpp"
 
+#include "controls.hpp"
 #include "custom_object.hpp"
 #include "debug_console.hpp"
 #include "entity.hpp"
@@ -519,6 +520,14 @@ void Entity::setControlStatus(const std::string& key, bool value)
 
 	const auto index = it - keys.begin();
 	controls_[index] = value;
+}
+
+void Entity::setActionStatus(std::map<std::string, bool> action_state){
+	actions_ = action_state;
+}
+
+std::map<std::string, bool> Entity::getActionStatus(){
+	return actions_;
 }
 
 void Entity::readControls(int cycle)

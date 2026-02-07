@@ -3625,7 +3625,6 @@ variant CustomObject::getValueBySlot(int slot) const
 	case CUSTOM_OBJECT_PLAYER_VERTICAL_LOOK:
 	case CUSTOM_OBJECT_PLAYER_CONTROL_LOCK:
 		return getPlayerValueBySlot(slot);
-
 	default:
 		if(slot >= type_->getSlotPropertiesBase() && (size_t(slot - type_->getSlotPropertiesBase()) < type_->getSlotProperties().size())) {
 			const CustomObjectType::PropertyEntry& e = type_->getSlotProperties()[slot - type_->getSlotPropertiesBase()];

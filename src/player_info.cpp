@@ -75,7 +75,13 @@ void PlayerInfo::readControls(int cycle)
 	bool status[controls::NUM_CONTROLS];
 	const std::string* user = nullptr;
 	controls::get_controlStatus(cycle, slot_, status, &user);
-
+	
+	// Read actions and store them in the entity object
+	std::map<std::string, bool> action_state;
+	action_state = controls::get_actionStatus(cycle, slot_);
+	entity_->setActionStatus(action_state);
+	//
+	
 	if(status[controls::CONTROL_LEFT] && status[controls::CONTROL_RIGHT]) {
 		//if both left and right are held, treat it as if neither are.
 		status[controls::CONTROL_LEFT] = status[controls::CONTROL_RIGHT] = false;

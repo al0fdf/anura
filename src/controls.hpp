@@ -159,6 +159,7 @@ namespace controls
 	void unread_local_controls();
 	void ignore_current_keypresses();
 
+	std::map<std::string, bool> get_actionStatus(int cycle, int player);
 	void get_controlStatus(int cycle, int player, bool* output, const std::string** user=nullptr);
 	void set_delay(int delay);
 

@@ -25,6 +25,7 @@
 
 #include "asserts.hpp"
 #include "collision_utils.hpp"
+#include "custom_object_callable.hpp"
 #include "difficulty.hpp"
 #include "formatter.hpp"
 #include "preferences.hpp"
@@ -34,6 +35,7 @@
 #include "level_runner.hpp"
 #include "playable_custom_object.hpp"
 #include "string_utils.hpp"
+#include "variant.hpp"
 #include "variant_utils.hpp"
 #include "widget.hpp"
 
@@ -156,7 +158,7 @@ void PlayableCustomObject::process(Level& lvl)
 {
 	prev_ctrl_keys_ = ctrl_keys_;
 	ctrl_keys_ = getCtrlKeys();
-
+	
 	if(player_info_.currentLevel() != lvl.id()) {
 		player_info_.setCurrentLevel(lvl.id());
 	}
@@ -182,7 +184,17 @@ void PlayableCustomObject::process(Level& lvl)
 
 		clearControlStatus();
 		readControls(lvl.cycle());
-
+		
+		// Set the ffl-accessible ctrl_actions value to the current action state
+		// (as retrieved from the entity object)
+		std::map<std::string, bool> act_state = getActionStatus();
+		std::map<variant, variant> temp = {};
+		
+		for(auto p =act_state.begin();p != act_state.end();p++){
+			temp[variant(p->first)] = variant(p->second);
+		}
+		ctrl_actions_ = variant(&temp);
+		
 		// XX Need to abstract this to read controls and mappings from global game file.
 		static const std::string keys[] = { "up", "down", "left", "right", "attack", "jump", "tongue", "sprint" };
 		for(int n = 0; n != controls::NUM_CONTROLS; ++n) {
@@ -221,6 +233,8 @@ variant PlayableCustomObject::getValue(const std::string& key) const
 		return getValueBySlot(CUSTOM_OBJECT_PLAYER_CTRL_MOD_KEYS);
 	} else if(key == "ctrl_keys") {
 		return getValueBySlot(CUSTOM_OBJECT_PLAYER_CTRL_KEYS);
+	} else if(key == "ctrl_actions") {
+		return getValueBySlot(CUSTOM_OBJECT_PLAYER_CTRL_ACTIONS);
 	} else if(key == "ctrl_mice") {
 		return getValueBySlot(CUSTOM_OBJECT_PLAYER_CTRL_MICE);
 	} else if(key == "ctrl_tilt") {
@@ -242,7 +256,7 @@ variant PlayableCustomObject::getValue(const std::string& key) const
 	if(key == "ctrl_user") {
 		return controlStatusUser();
 	}
-
+	
 	if(key == "player") {
 		return variant::from_bool(true);
 	} else if(key == "vertical_look") {
@@ -329,6 +343,14 @@ variant PlayableCustomObject::getPlayerValueBySlot(int slot) const
 
 		return ctrl_keys_;
 
+	}
+	case CUSTOM_OBJECT_PLAYER_CTRL_ACTIONS: {
+		if(ctrl_actions_.is_null()) {
+			std::map<variant, variant> res;
+			return variant(&res);
+		}
+
+		return ctrl_actions_;
 	}
 	case CUSTOM_OBJECT_PLAYER_CTRL_PREV_KEYS: {
 		if(prev_ctrl_keys_.is_null()) {

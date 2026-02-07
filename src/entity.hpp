@@ -260,11 +260,17 @@ public:
 	virtual int getHitpoints() const { return 1; }
 	virtual int getMaxHitpoints() const { return 1; }
 
+	std::map<std::string, bool> getActionStatus();
+	void setActionStatus(std::map<std::string, bool> action_state);
+	
 	void setControlStatusUser(const variant& v) { controls_user_ = v; }
 	void setControlStatus(const std::string& key, bool value);
+	
 	void setControlStatus(controls::CONTROL_ITEM ctrl, bool value) { controls_[ctrl] = value; }
 	void clearControlStatus() { for(int n = 0; n != controls::NUM_CONTROLS; ++n) { controls_[n] = false; } }
-
+	
+	
+	
 	virtual bool enter() const { return false; }
 
 	virtual void setInvisible(bool value) {}
@@ -421,7 +427,9 @@ private:
 	// a boolean list which holds the state(true/false) of each action(e.g. CONTROL_ATTACK or CONTROL_SPRINT).
 	bool controls_[controls::NUM_CONTROLS];
 	variant controls_user_;
-
+	
+	std::map<std::string, bool> actions_;
+	
 	//attached objects are objects which are also drawn with this object.
 	//attached objects should generally NOT be present in the level, and are
 	//NOT processed independently of this object.

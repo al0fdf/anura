@@ -503,6 +503,7 @@ namespace controls
 	{
 		ControlFrame ctrl;
 		ctrl.keys = state;
+		ctrl.actions = {};
 		local_control_locks.push(ctrl);
 	}
 
@@ -692,7 +693,23 @@ namespace controls
 		controls[local_player].pop_back();
 		highest_confirmed[local_player]--;
 	}
+	
+	std::map<std::string, bool> get_actionStatus(int cycle, int player)
+	{
+		//NOTE: copying function definition from get_controlStatus for input remap stage 4
+		// again, cycle and/or user might not be needed if multiplayer logic is ripped out - al2f
+		// 
+		// --cycle;
+		cycle -= starting_cycles;
 
+		cycle -= delay;
+		
+		// Return the action state from the current frame
+		ASSERT_INDEX_INTO_VECTOR(cycle, controls[player]);
+		std::map<std::string, bool> action_state = controls[player][cycle].actions;
+		return action_state;
+	}
+	
 	void get_controlStatus(int cycle, int player, bool* output, const std::string** user)
 	{
 		//NOTE: Possible place for updating frogatto's input state based on actions. - al2f
@@ -818,6 +835,7 @@ namespace controls
 				return;
 			}
 			ControlFrame state;
+			state.actions = {};
 			state.keys = *buf;
 
 			++buf;
