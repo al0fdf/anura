@@ -194,10 +194,8 @@ void PlayableCustomObject::process(Level& lvl)
 		for(auto p =act_state.begin();p != act_state.end();p++){
 			temp[variant(p->first)] = variant(p->second);
 		}
-		//TODO: remove.
-		// Proof that ctrl_actions_ should not be null
-		// LOG_INFO(variant(&temp));
 		ctrl_actions_ = variant(&temp);
+		//
 		
 		// XX Need to abstract this to read controls and mappings from global game file.
 		static const std::string keys[] = { "up", "down", "left", "right", "attack", "jump", "tongue", "sprint" };
