@@ -157,6 +157,8 @@ int PlayableCustomObject::walkUpOrDownStairs() const
 
 void PlayableCustomObject::process(Level& lvl)
 {
+	prev_ctrl_actions_ = ctrl_actions_;
+	
 	prev_ctrl_keys_ = ctrl_keys_;
 	ctrl_keys_ = getCtrlKeys();
 	
@@ -195,7 +197,9 @@ void PlayableCustomObject::process(Level& lvl)
 			temp[variant(p->first)] = variant(p->second);
 		}
 		ctrl_actions_ = variant(&temp);
-		//
+		// end action handling
+		
+		
 		
 		// XX Need to abstract this to read controls and mappings from global game file.
 		static const std::string keys[] = { "up", "down", "left", "right", "attack", "jump", "tongue", "sprint" };
@@ -237,6 +241,8 @@ variant PlayableCustomObject::getValue(const std::string& key) const
 		return getValueBySlot(CUSTOM_OBJECT_PLAYER_CTRL_KEYS);
 	} else if(key == "ctrl_actions") {
 		return getValueBySlot(CUSTOM_OBJECT_PLAYER_CTRL_ACTIONS);
+	} else if(key == "prev_ctrl_actions") {
+		return getValueBySlot(CUSTOM_OBJECT_PLAYER_CTRL_PREV_ACTIONS);
 	} else if(key == "ctrl_mice") {
 		return getValueBySlot(CUSTOM_OBJECT_PLAYER_CTRL_MICE);
 	} else if(key == "ctrl_tilt") {
@@ -347,13 +353,20 @@ variant PlayableCustomObject::getPlayerValueBySlot(int slot) const
 
 	}
 	case CUSTOM_OBJECT_PLAYER_CTRL_ACTIONS: {
-		LOG_INFO(ctrl_actions_);
 		if(ctrl_actions_.is_null()) {
 			std::map<variant, variant> res;
 			return variant(&res);
 		}
 
 		return ctrl_actions_;
+	}
+	case CUSTOM_OBJECT_PLAYER_CTRL_PREV_ACTIONS: {
+		if(prev_ctrl_actions_.is_null()) {
+			std::map<variant, variant> res;
+			return variant(&res);
+		}
+
+		return prev_ctrl_actions_;
 	}
 	case CUSTOM_OBJECT_PLAYER_CTRL_PREV_KEYS: {
 		if(prev_ctrl_keys_.is_null()) {
