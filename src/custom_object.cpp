@@ -46,6 +46,7 @@
 #include "collision_utils.hpp"
 #include "ColorTransform.hpp"
 #include "custom_object.hpp"
+#include "controls.hpp"
 #include "custom_object_callable.hpp"
 #include "custom_object_functions.hpp"
 #include "debug_console.hpp"
@@ -3611,7 +3612,11 @@ variant CustomObject::getValueBySlot(int slot) const
 		// action name, and controlStatus is rewritten to  use an action name instead
 		// of the hard-coded control key ints
 		const char* idx_to_action[7] = {"up", "down", "left", "right", "item", "jump", "tongue"};
-		return variant::from_bool(controlStatus(idx_to_action[slot - CUSTOM_OBJECT_CTRL_UP]));
+		int control_idx = slot - CUSTOM_OBJECT_CTRL_UP;
+		//const char* control_name = idx_to_action[control_idx];
+		controls::CONTROL_ITEM c = (controls::CONTROL_ITEM) control_idx;
+		bool is_control_pressed = controlStatus(c);
+		return variant::from_bool(is_control_pressed);
 	}
 
 	case CUSTOM_OBJECT_CTRL_USER:
