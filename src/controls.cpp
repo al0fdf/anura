@@ -201,6 +201,27 @@ namespace controls
 		this->event_mapping[action] = combos;
 	}
 
+	void ActionBindings::set_events_for_action_ffl(std::string action, variant events){
+		//Convert ffl variant to vector<vector<InputEvent>> i.e. EventComboList
+		EventComboList new_combos = {};
+		
+		std::vector<variant> event_combos = events.as_list();
+		for(int i=0; i<event_combos.size();i++){
+			EventCombo new_event_combo = {};
+
+			std::vector<variant> event_combo = event_combos[i].as_list();
+			for(int j=0;j<event_combo.size();j++){
+				InputEvent ev = InputEvent::from_variant(event_combo[j]);
+				new_event_combo.push_back(ev);
+			}
+
+			new_combos.push_back(new_event_combo);
+		}
+
+		// Call appropriate c++ method.
+		set_events_for_action(action, new_combos);
+	}
+	
 	bool ActionBindings::has_action(std::string action_name){
 		if(this->key_mapping.find(action_name) == this->key_mapping.end()){
 			return false;

@@ -4484,6 +4484,37 @@ RETURN_TYPE("bool")
 			RETURN_TYPE("list");
 	END_FUNCTION_DEF(get_events_for_action)
 
+	FUNCTION_DEF(set_events_for_action, 2, 2, "set_events_for_action(string, list[map[string, string|int]]) -> void: Sets the list of event combinations configured for an action replacing the old list.")
+		std::string action_name = EVAL_ARG(0).as_string();
+		variant event_combo_list = EVAL_ARG(1);
+		controls::get_control_mappings()->set_events_for_action_ffl(action_name, event_combo_list);
+		return variant();
+		
+		FUNCTION_ARGS_DEF
+			ARG_TYPE("string");
+			ARG_TYPE("map");
+		RETURN_TYPE("null");
+	END_FUNCTION_DEF(set_events_for_action)
+
+	FUNCTION_DEF(set_are_bindings_default, 2, 2, "set_are_bindings_default(string, bool) -> bool")
+		std::string action_name = EVAL_ARG(0).as_string();
+		bool is_default = EVAL_ARG(1).as_bool();
+		controls::get_control_mappings()->set_are_bindings_default(action_name, is_default);
+		return variant();
+	FUNCTION_ARGS_DEF
+		ARG_TYPE("string");
+	RETURN_TYPE("null");
+	END_FUNCTION_DEF(set_are_bindings_default)
+	
+	FUNCTION_DEF(are_bindings_default_for_action, 1, 1, "are_bindings_default_for_action(string) -> bool")
+		std::string action_name = EVAL_ARG(0).as_string();
+		bool result = controls::get_control_mappings()->are_bindings_default_for_action(action_name);
+		return variant(result);
+	FUNCTION_ARGS_DEF
+		ARG_TYPE("string");
+	RETURN_TYPE("bool");
+	END_FUNCTION_DEF(are_bindings_default_for_action)
+	
 	FUNCTION_DEF(eval, 1, 2, "eval(str, [arg map]): evaluate the given string as FFL")
 		variant s = EVAL_ARG(0);
 		try {

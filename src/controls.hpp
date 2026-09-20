@@ -91,7 +91,8 @@ namespace controls
 			//variant del_key_for_action(std::string action_name, int at_index);
 			std::map<std::string, std::string> get_action_names();
 			void set_events_for_action(std::string action, EventComboList &combos);
-
+			void set_events_for_action_ffl(std::string action, variant event_combo_list);
+			
 			bool has_action(std::string action_name);
 			void set_are_bindings_default(std::string action_name, bool value);
 			bool are_bindings_default_for_action(std::string action_name);
